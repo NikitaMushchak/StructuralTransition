@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
     if(iproc==0)
     {
         CalcBorder CB;
-        CB.createPoints3D();
+        // CB.createPoints3D();
+        CB.createPoints1D();
+        // CB.createPoints3DLineBCC();
         //std::cerr<<"Q-1\n";
         CB.createIMatrix();
         //std::cin.get();

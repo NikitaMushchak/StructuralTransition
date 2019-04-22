@@ -8,6 +8,7 @@ struct StabilityPointType
     double StabilityTime;
     int_fast32_t PointType, i;
     uint_fast8_t Stability;
+    double PotEnergy;
 };
 
 struct ElasticModules2D
@@ -25,6 +26,7 @@ struct TaskType2D
     boost::qvm::mat<double,2,2> D;
     double Ek;
     int_fast32_t Step, i;
+    double PotEnergy;
 };
 
 struct TaskType3D
@@ -32,6 +34,7 @@ struct TaskType3D
     boost::qvm::mat<double,3,3> D;
     double Ek;
     int_fast32_t Step, i;
+    double PotEnergy;
 };
 
 struct MacroParametrsType

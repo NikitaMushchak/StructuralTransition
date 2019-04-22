@@ -10,7 +10,7 @@ void MD::setMPP()
     P_alfa2 =350.0;
     P_D = 1.0;
     P_D2= 0.4;
-    P_a_cut = 0.5*(CSDFCC[3]+CSDFCC[4]);
+    P_a_cut = 0.5*(CSDFCC[9]+CSDFCC[10]); // было между 3 и 4 координационной сферой
     P_aa_cut = P_a_cut*P_a_cut;
     P_F = 2.0*P_D*P_alfa/P_a;
     P_F2 = 2.0*P_D2*P_alfa2;

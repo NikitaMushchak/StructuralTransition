@@ -5,15 +5,15 @@ CalcBorder::CalcBorder()
     //ctor
     SA = nullptr;
     MDC = nullptr;
-    boost::qvm::X(e[0])= -0.6;
-    boost::qvm::Y(e[0])= -0.6;
-    boost::qvm::Z(e[0])= -0.6; // -0.6
-    boost::qvm::X(e[1])=  -0.1;
-    boost::qvm::Y(e[1])=  -0.1;
-    boost::qvm::Z(e[1])=  -0.1;
-    boost::qvm::X(n) = 30;
-    boost::qvm::Y(n) = 30;//2*uint_fast32_t(X(n)*MC_1ds3);
-    boost::qvm::Z(n) = 30;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::X(e[0])= -0.2;
+    boost::qvm::Y(e[0])= boost::qvm::X(e[0]);//-0.6;
+    boost::qvm::Z(e[0])= boost::qvm::X(e[0])*(MC_s6 - 3.)/(MC_2s3 - 3.);//-0.6; // -0.6
+    boost::qvm::X(e[1])= 0.7;
+    boost::qvm::Y(e[1])= boost::qvm::X(e[1]);//-0.1;
+    boost::qvm::Z(e[1])= boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
+    boost::qvm::X(n) = 2*250;
+    boost::qvm::Y(n) = 2*250;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::Z(n) = 2*250;//2*uint_fast32_t(X(n)*MC_1ds3);
     BorderPrecision = 1e-2;
     NStepA = 100;
 	NStepB = 1000;
@@ -98,6 +98,7 @@ void CalcBorder::createPoints3D()
     n*=2;
     n+=MC_i1XYZV3;
     N = boost::qvm::X(n)*boost::qvm::Y(n)*boost::qvm::Z(n)/2+1;
+    // N = boost::qvm::X(n);
     //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<"\n";
     //std::cin.get();
     _1d_n.a[0] = 1.0/double(n.a[0]);
@@ -152,6 +153,81 @@ void CalcBorder::createPoints3D()
     //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<"\n";
     std::cerr<<"C "<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
     //std::cin.get();
+}
+void CalcBorder::createPoints3DLineBCC()
+{
+    boost::qvm::X(eStep) = (boost::qvm::X(e[1])-boost::qvm::X(e[0]))/double(boost::qvm::X(n));
+    boost::qvm::Y(eStep) = (boost::qvm::Y(e[1])-boost::qvm::Y(e[0]))/double(boost::qvm::Y(n));
+    boost::qvm::Z(eStep) = (boost::qvm::Z(e[1])-boost::qvm::Z(e[0]))/double(boost::qvm::Z(n));//boost::qvm::X(eStep);
+    // boost::qvm::Z(eStep) = (boost::qvm::Z(e[1])-boost::qvm::Z(e[0]))/double(boost::qvm::Z(n));
+    boost::qvm::Y(n) = (boost::qvm::Y(e[1])-boost::qvm::Y(e[0]))/boost::qvm::Y(eStep);
+    //boost::qvm::Z(n) = (boost::qvm::Z(e[1])-boost::qvm::Z(e[0]))/boost::qvm::Z(eStep)+1;
+    //N = 4*boost::qvm::X(n)*boost::qvm::Y(n)*boost::qvm::Z(n);
+    n*=2;
+    n+=MC_i1XYZV3;
+    // N = boost::qvm::X(n)*boost::qvm::Y(n)*boost::qvm::Z(n)/2+1;
+    N = boost::qvm::X(n);
+    //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<"\n";
+    //std::cin.get();
+    _1d_n.a[0] = 1.0/double(n.a[0]);
+    _1d_n.a[1] = 1.0/double(n.a[1]);
+    _1d_n.a[2] = 1.0/double(n.a[2]);
+    //AA = boost::qvm::mag_sqr(eStep);
+    AA = boost::qvm::X(eStep)*boost::qvm::X(eStep)*0.5*2.1*2.1;
+    //NL = 2*boost::qvm::Y(n)*(boost::qvm::X(n)-1)+2*(boost::qvm::Y(n)-1)*(2*boost::qvm::X(n)-1)+10;
+    std::cerr<<"Number "<<N<<"\n";
+    P = new boost::qvm::vec<double,3>[N];
+    Pi = new boost::qvm::vec<int_fast32_t,3>[N];
+    S = new boost::qvm::mat<double,3,3>[N];
+    Pdata = new StabilityPointType[N];
+    I = new uint_fast32_t[2*N];
+    memset(Pdata,0,N*sizeof(StabilityPointType));
+    //I = new uint_fast32_t[NL];
+    boost::qvm::vec<double,3> rCenter = 0.5*(e[0]+e[1]);
+    double drrCenterMin = 1e99, drrCenter;
+    uint_fast32_t i, j, k, iN = 0;
+    // for(k=0; k<n.a[2]; ++k)
+    //     for(j=0; j<n.a[1]; ++j)
+    //         for(i=0; i<n.a[0]; ++i)
+
+  std::ofstream myfile;
+  myfile.open("line.txt");
+  // myfile << "Writing this to a file.\n";
+  // myfile.close();
+
+  for(size_t i = 0 ; i< N; ++i){
+                // if((i%2+j%2+k%2)%2)
+                //     continue;
+        P[iN].a[0] = e[0].a[0]+i*0.5*eStep.a[0];
+        P[iN].a[1] = e[0].a[1]+i*0.5*eStep.a[1];
+        P[iN].a[2] = e[0].a[2]+i*0.5*eStep.a[2];
+        Pi[iN].a[0] = i;
+        Pi[iN].a[1] = 0;//i;
+        Pi[iN].a[2] = 0;//i;
+        I[Pi[iN].a[0]+Pi[iN].a[1]*n.a[0]+Pi[iN].a[2]*n.a[0]*n.a[1]] = iN;
+        drrCenter = boost::qvm::mag_sqr(rCenter-P[iN]);
+        if(drrCenter<drrCenterMin)
+        {
+            drrCenterMin = drrCenter;
+            nCenter = Pi[iN];
+
+        }
+                //std::cerr<<"C "<<iN<<" "<<i<<" "<<j<<" "<<k<<" "<<P[iN].a[0]<<" "<<P[iN].a[1]<<" "<<P[iN].a[2]<<" "<<Pi[iN].a[0]+Pi[iN].a[1]*n.a[0]+Pi[iN].a[2]*n.a[0]*n.a[1]<<" "<<I[Pi[iN].a[0]+Pi[iN].a[1]*n.a[0]+Pi[iN].a[2]*n.a[0]*n.a[1]]<<"\n";
+        myfile<<P[iN].a[0]<<" "<<P[iN].a[1]<<" "<<P[iN].a[2]<<"\n";//std::endl;
+                //<<" "<<ParticleCoordinate[Particles.ParticlesNumber].y
+                //<<" "<<ParticleCoordinate[Particles.ParticlesNumber].z<<"\n";
+                //std::cin.get();
+        ++iN;
+    }
+
+    nCenter.a[0] -= nCenter.a[0]%2;
+    nCenter.a[1] -= nCenter.a[1]%2;
+    nCenter.a[2] -= nCenter.a[2]%2;
+    iCenter = I[nCenter.a[0]+nCenter.a[1]*n.a[0]+nCenter.a[2]*n.a[0]*n.a[1]];
+    //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<"\n";
+    std::cerr<<"C "<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
+    //std::cin.get();
+    myfile.close();
 }
 
 void CalcBorder::createPoints2D()
@@ -210,6 +286,76 @@ void CalcBorder::createPoints2D()
             //std::cerr<<"P "<<iN<<" "<<P[iN].a[0]<<" "<<P[iN].a[1]<<"\n";
         }
     }
+
+    nCenter.a[0] -= nCenter.a[0]%2;
+    nCenter.a[1] -= nCenter.a[1]%2;
+    nCenter.a[2] -= nCenter.a[2]%2;
+    iCenter = I[nCenter.a[0]+nCenter.a[1]*n.a[0]+nCenter.a[2]*n.a[0]*n.a[1]];
+    //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<"\n";
+    std::cerr<<"C "<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
+    //std::cerr<<"C "<<nCenter.a[0]<<" "<<nCenter.a[1]<<" "<<nCenter.a[2]<<" "<<rCenter.a[0]<<" "<<rCenter.a[1]<<" "<<rCenter.a[2]<<"\n";
+    //std::cin.get();
+}
+
+void CalcBorder::createPoints1D()
+{
+    boost::qvm::X(eStep) = (boost::qvm::X(e[1])-boost::qvm::X(e[0]))/double(boost::qvm::X(n)-1);
+    // boost::qvm::Y(eStep) = boost::qvm::X(eStep)*MC_s3d2;
+    // uint_fast32_t Yn = (boost::qvm::Y(e[1])-boost::qvm::Y(e[0]))/boost::qvm::Y(eStep);
+    // boost::qvm::Y(n) = (Yn%2)?Yn+1:Yn;
+    //boost::qvm::Z(eStep) = boost::qvm::X(eStep);
+    boost::qvm::Z(eStep) = 0;
+    boost::qvm::Y(eStep) = 0;
+    boost::qvm::Z(n) = 1;
+    boost::qvm::Y(n) = 1;
+    //N = 4*boost::qvm::X(n)*boost::qvm::Y(n)*boost::qvm::Z(n);
+    N = boost::qvm::X(n);
+    // N = boost::qvm::X(n)*boost::qvm::Y(n);
+    //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<"\n";
+    //std::cin.get();
+    _1d_n.a[0] = 1.0/double(n.a[0]);
+    _1d_n.a[1] = 0;//1.0/double(n.a[1]);
+    _1d_n.a[2] = 0;
+    //AA = boost::qvm::mag_sqr(eStep);
+    AA = boost::qvm::X(eStep)*boost::qvm::X(eStep)*1.44;
+    //NL = 2*boost::qvm::Y(n)*(boost::qvm::X(n)-1)+2*(boost::qvm::Y(n)-1)*(2*boost::qvm::X(n)-1)+10;
+    std::cerr<<"Number "<<N<<"\n";
+    P = new boost::qvm::vec<double,3>[N];
+    Pi = new boost::qvm::vec<int_fast32_t,3>[N];
+    S = new boost::qvm::mat<double,3,3>[N];
+    Pdata = new StabilityPointType[N];
+    I = new uint_fast32_t[2*N];
+    memset(Pdata,0,N*sizeof(StabilityPointType));
+    //I = new uint_fast32_t[NL];
+    boost::qvm::vec<double,3> rCenter = 0.5*(e[0]+e[1]);
+    double drrCenterMin = 1e99, drrCenter;
+    boost::qvm::vec<double,2> tmp= {0,0};
+    uint_fast32_t i, j, iN = 0;
+    // for(j=0; j<boost::qvm::Y(n); ++j)
+    // {
+        boost::qvm::X(tmp) = 0.5*boost::qvm::X(eStep)*(j%2);
+        for(i=0; i<boost::qvm::X(n); ++i)
+        {
+            P[iN].a[0] = e[0].a[0]+i*eStep.a[0]+tmp.a[0];
+            P[iN].a[1] = 0;//e[0].a[1]+j*eStep.a[1]+tmp.a[1];
+            P[iN].a[2] = 0;
+            Pi[iN].a[0] = i;
+            Pi[iN].a[1] = 0;//j;
+            Pi[iN].a[2] = 0;
+            I[Pi[iN].a[0]+Pi[iN].a[1]*n.a[0]+Pi[iN].a[2]*n.a[0]*n.a[1]] = iN;
+
+            //std::cerr<<"C "<<iN<<" "<<N<<" "<<P[iN].a[0]<<" "<<P[iN].a[1]<<" "<<P[iN].a[2]<<"\n";
+            drrCenter = boost::qvm::mag_sqr(rCenter-P[iN]);
+            if(drrCenter<drrCenterMin)
+            {
+                drrCenterMin = drrCenter;
+                nCenter = Pi[iN];
+
+            }
+            ++iN;
+            //std::cerr<<"P "<<iN<<" "<<P[iN].a[0]<<" "<<P[iN].a[1]<<"\n";
+        }
+    // }
 
     nCenter.a[0] -= nCenter.a[0]%2;
     nCenter.a[1] -= nCenter.a[1]%2;
