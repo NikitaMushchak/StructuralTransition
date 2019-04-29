@@ -30,10 +30,11 @@ public:
     boost::qvm::vec<double,3> *e, *ein, *ea, *R, *RS;
     double *A, *Ain, *_1d_A, *P1, *P2, *CSD;
     uint_fast32_t *CSN;
-    //CalcBorder *CB;
+    // CalcBorder *CB;
     boost::random::mt19937 generator;
     boost::random::uniform_on_sphere<double> distribution;
-    boost::random::variate_generator<boost::random::mt19937&, boost::random::uniform_on_sphere<double> > distr;
+    boost::random::variate_generator<boost::random::mt19937&,
+            boost::random::uniform_on_sphere<double> > distr;
     boost::qvm::vec<double,3> aStep;
     boost::qvm::vec<uint_fast32_t,3> n, nCenter;
     boost::qvm::mat<double,3,3> Stress;
@@ -41,8 +42,10 @@ public:
     boost::qvm::mat<double,9,9> Stiffness, Ductility;
 
     double V, _1d_V, E, NearZero, NearSphere,
-    P_aCut, P_P1, P_P2, P_D, P_alfa, P_a,
+    P_aCut, P_P1, P_P2, P_D, P_D2, P_alfa, P_alfa2, P_a,P_a2,
     EpsDeform_const, eXYMax;
+
+    double P_F, P_F2, P_C , P_C2;
     uint_fast32_t N, iCenter, CSDN, MaxCSDN, RSN;
 protected:
 private:

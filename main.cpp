@@ -9,7 +9,7 @@ int Nproc, iproc;
 int main(int argc, char *argv[])
 {
     char taskdir[256]=".", filename[256]="";
-    //boost::qvm::vec<float,3> v={0,0,7};
+    boost::qvm::vec<float,3> v={0,0,7};
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &Nproc);
     MPI_Comm_rank(MPI_COMM_WORLD, &iproc);
@@ -17,13 +17,17 @@ int main(int argc, char *argv[])
     if(iproc==0)
     {
         CalcBorder CB;
+
         CB.createPoints3D();
+        // CB.createPoints1D();
+        // CB.createPoints3DLineBCC();
         //std::cerr<<"Q-1\n";
         CB.createIMatrix();
         //std::cin.get();
         //std::cerr<<"Q0\n";
-        ///CB.checkStability();
-        CB.checkStability_MPI();
+        CB.checkStability();
+
+        // CB.checkStability_MPI();
     }
     else
     {
@@ -33,6 +37,31 @@ int main(int argc, char *argv[])
 
     MPI_Finalize();
 
+
+
+    // CalcBorder CB;
+    //
+    // CB.createPoints3D();
+    // // CB.createPoints1D();
+    // // CB.createPoints3DLineBCC();
+    // //std::cerr<<"Q-1\n";
+    // CB.createIMatrix();
+    // //std::cin.get();
+    // //std::cerr<<"Q0\n";
+    // CB.checkStability();
+
+
+
+
+    // CalcBorder CB;
+    // CB.createPoints3D();
+    // CB.createPoints1D();
+    // CB.createPoints3DLineBCC();
+    //std::cerr<<"Q-1\n";
+    // CB.createIMatrix();
+    //std::cin.get();
+    //std::cerr<<"Q0\n";
+    // CB.checkStability();
     //std::cerr<<"Q1\n";
     ///CB.findBorder();
     //std::cerr<<"Q2\n";

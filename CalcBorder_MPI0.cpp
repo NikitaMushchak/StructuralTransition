@@ -6,15 +6,26 @@ extern int_fast32_t Nproc, iproc;
 void CalcBorder::checkStability_MPI()
 {
     //int t1=clock(),t2;
-	char filename[256]="";	
+	char filename[256]="";
     checkStabilityMPIMD(P,Pdata,S,N);
-	
+
     strcpy(filename, "./ResultnStable1.txt");
     std::ofstream ResultStable1_file(filename);
-    for(uint_fast32_t i=0; i<N; ++i)
-    {
-        if(int(Pdata[i].Stability)==2)
-            ResultStable1_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
+
+	strcpy(filename, "./Resultn1.txt");
+    std::ofstream Result1_file(filename);
+	std::cout<<" NNNNNNNNNNNNNN = "<<N<<std::endl;
+    for(uint_fast32_t i=0; i<N; ++i){
+
+		Result1_file<<P[i].a[0] <<" "<<P[i].a[1]<<" "<<P[i].a[2]<<
+			" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<" "
+			<<Pdata[i].PotEnergy<<" "<<Pdata[i].NumberBonds<<" "
+			<<int(Pdata[i].Stability)<<" 111111"<<"\n";
+
+
+		if(int(Pdata[i].Stability)==2)
+            ResultStable1_file<<P[i].a[0]-1.<<" "<<P[i].a[1]-1.<<" "<<P[i].a[2]-1<<
+			" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
     }
     ResultStable1_file.close();
 	strcpy(filename, "./ResultC1.dat");
@@ -36,12 +47,12 @@ void CalcBorder::checkStability_MPI()
     {
         Pdata[i].PointType = 0;
     }/**/
-	
-	
+
+
     CheckBorderMD();
     std::cerr<<"Good\n";
     //std::cin.get();
-    
+
     strcpy(filename, "./ResultC.dat");
     std::ofstream ResultCb_file(filename, std::ios::binary);
     ResultCb_file.write((char*)&N,sizeof(uint_fast32_t));
@@ -55,16 +66,24 @@ void CalcBorder::checkStability_MPI()
     std::ofstream ResultUStable_file(filename);
     strcpy(filename, "./ResultnStable.txt");
     std::ofstream ResultStable_file(filename);
-    for(uint_fast32_t i=0; i<N; ++i)
+    for(uint_fast32_t i = 0; i < N; ++i)
     {
-        ResultC_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<int(Pdata[i].Stability)<<" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
-        if(int(Pdata[i].Stability)==1)
-            ResultUStable_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
+        ResultC_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<
+		int(Pdata[i].Stability)<<" "<<Pdata[i].StabilitySteps<<" "<<
+		Pdata[i].StabilityTime<<" "<<Pdata[i].PotEnergy<<" "
+		<<"  a"<<"\n";
+
+		if(int(Pdata[i].Stability)==1)
+            ResultUStable_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<
+			Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<" "<<
+			Pdata[i].PotEnergy<<"\n";
+
         else if(int(Pdata[i].Stability)==2)
-            ResultStable_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
+            ResultStable_file<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<
+			Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
     }
     ResultC_file.close();
-    /**findBorder();
+    findBorder();
     //std::cerr<<"Q1 "<<NbL<<"\n";
     //std::cin.get();
     preciseBorderCreate();
@@ -77,9 +96,11 @@ void CalcBorder::checkStability_MPI()
     for(uint_fast32_t i=0;i<NbL;++i)
     {
 
-        ///toElastic2D(CB.Sbc[i],EM);
-        //if(EM.Ex<0)
-        ResultBc_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<Pbc[i].a[2]<<" "<<int(Pbcdata[i].Stability)<<" "<<Pbcdata[i].StabilitySteps<<" "<<Pbcdata[i].StabilityTime<<"\n";
+        // /toElastic2D(CB.Sbc[i],EM);
+        // if(EM.Ex<0)
+        ResultBc_file<<Pbc[i].a[0]-1.<<" "<<Pbc[i].a[1]-1.<<" "<<Pbc[i].a[2]-1.
+			<<" "<<int(Pbcdata[i].Stability)<<" "<<Pbcdata[i].StabilitySteps
+			<<" "<<Pbcdata[i].StabilityTime<<" "<<Pbcdata[i].PotEnergy<<"\n";
     }
     ResultBc_file.close();
     for(uint_fast32_t i=0;i<NbL;++i)
@@ -87,7 +108,9 @@ void CalcBorder::checkStability_MPI()
 
         ///toElastic2D(CB.Sbc[i],EM);
         //if(EM.Ex<0)
-        Result2Bc_file<<Pb[i].a[0]<<" "<<Pb[i].a[1]<<" "<<Pb[i].a[2]<<" "<<int(Pbdata[i].Stability)<<" "<<Pbdata[i].StabilitySteps<<" "<<Pbdata[i].StabilityTime<<"\n";
+        Result2Bc_file<<Pb[i].a[0]-1.<<" "<<Pb[i].a[1]-1.<<" "<<Pb[i].a[2]-1.
+			<<" "<<int(Pbdata[i].Stability)<<" "<<Pbdata[i].StabilitySteps
+			<<" "<<Pbdata[i].StabilityTime<<" "<<Pbcdata[i].PotEnergy<<"\n";
     }
     Result2Bc_file.close();
     //std::cerr<<"Q3\n";
@@ -99,9 +122,12 @@ void CalcBorder::checkStability_MPI()
         for(uint_fast32_t i=0; i<NbL; ++i)
         {
             if(Pbcdata[i].Stability==1)
-                ResultUStable_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<Pbcdata[i].StabilitySteps<<" "<<Pbcdata[i].StabilityTime<<"\n";
+                ResultUStable_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "
+				<<Pbcdata[i].StabilitySteps<<" "<<Pbcdata[i].StabilityTime<<"\n";
+
             else if(Pbcdata[i].Stability==2)
-                ResultStable_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<Pbcdata[i].StabilitySteps<<" "<<Pbcdata[i].StabilityTime<<"\n";
+                ResultStable_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<
+				Pbcdata[i].StabilitySteps<<" "<<Pbcdata[i].StabilityTime<<"\n";
         }
         preciseBorderReCreate();
         std::cerr<<NbL<<" "<<NbLAll<<"\n";
@@ -119,9 +145,14 @@ void CalcBorder::checkStability_MPI()
     std::ofstream ResultBcLU_file(filename);
     for(uint_fast32_t i=0;i<NbL;++i)
     {
-        ResultBcL_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<Pbc[i].a[2]<<" "<<Pbcdata[i].StabilitySteps<<"\n";
-        ResultBcLS_file<<Pb[2*i].a[0]<<" "<<Pb[2*i].a[1]<<" "<<Pb[2*i].a[2]<<" "<<Pbdata[2*i].StabilitySteps<<"\n";
-        ResultBcLU_file<<Pb[2*i+1].a[0]<<" "<<Pb[2*i+1].a[1]<<" "<<Pb[2*i+1].a[2]<<" "<<Pbdata[2*i+1].StabilitySteps<<"\n";
+        ResultBcL_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<Pbc[i].a[2]
+		<<" "<<Pbcdata[i].StabilitySteps<<"\n";
+
+        ResultBcLS_file<<Pb[2*i].a[0]<<" "<<Pb[2*i].a[1]<<" "<<Pb[2*i].a[2]
+		<<" "<<Pbdata[2*i].StabilitySteps<<"\n";
+
+        ResultBcLU_file<<Pb[2*i+1].a[0]<<" "<<Pb[2*i+1].a[1]<<" "<<
+		Pb[2*i+1].a[2]<<" "<<Pbdata[2*i+1].StabilitySteps<<"\n";
     }
     ResultBcL_file.close();
     ResultBcLS_file.close();
@@ -222,6 +253,9 @@ void taskSRMPIi(MD *MDC)
             MDC->calculateStateIM();
             MDC->Ek0 = MDC->Ek;
             MDC->Ep0 = MDC->Ep;
+
+			double PotEnergy = MDC->Ep/MDC->N;
+
             if(MDC->NM==1)goto SkipCalci;
             for(i=0; i<Task.Step; ++i)
             {
@@ -231,9 +265,11 @@ void taskSRMPIi(MD *MDC)
                 MDC->calculateIncrements();
                 //std::cerr<<"Q "<<MDC->t<<" "<<MDC->Ek*MDC->_1d_N<<" "<<MDC->Ek0*MDC->_1d_N<<" "<<MDC->Ep<<" "<<MDC->P_Cmax<<" "<<MDC->P_C<<"\n";
                 //std::cin.get();
+				PotEnergy = MDC->Ep/MDC->N;
                 if(MDC->Ek>1.01*MDC->Ek0)
                 {
-                    //std::cerr<<"NOT Stable!!!!!\n";
+					PotEnergy = MDC->Ep/MDC->N;
+					//std::cerr<<"NOT Stable!!!!!\n";
                     break;
                 }
             }
@@ -242,11 +278,24 @@ SkipCalci:;
             Result.Stability = (i==Task.Step)?2:1;
             Result.StabilityTime = MDC->t;
             Result.StabilitySteps = i;
-            ResultiC_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<int(Result.Stability)<<" "<<Result.StabilitySteps<<" "<<Result.StabilityTime<<"\n";
+			Result.NumberBonds = MDC->NM;
+			Result.PotEnergy = PotEnergy;
+            ResultiC_file<<Task.D.a[0][0] - 1.<<" "<<Task.D.a[1][1] - 1.<<" "<<
+			Task.D.a[2][2] - 1.<<" "<<int(Result.Stability)<<" "<<
+			Result.StabilitySteps<<" "<<Result.StabilityTime
+			<<" "<<Result.PotEnergy<<" "<<Result.NumberBonds<<" "<<
+			int(Result.Stability)<<"\n";
+
             if(int(Result.Stability)==1)
-                ResultiUStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<Result.StabilitySteps<<" "<<Result.StabilityTime<<"\n";
+                ResultiUStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]
+				<<" "<<Task.D.a[2][2]<<" "<<Result.StabilitySteps
+				<<" "<<Result.StabilityTime<<" "<<Result.PotEnergy<<"\n";
+
             else if(int(Result.Stability)==2)
-                ResultiStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<Result.StabilitySteps<<" "<<Result.StabilityTime<<"\n";
+                ResultiStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]
+				<<" "<<Task.D.a[2][2]<<" "<<Result.StabilitySteps
+				<<" "<<Result.StabilityTime<<"\n";
+
             ResultiCbin_file.write((char*)&Task,sizeof(TaskType3D));
             ResultiCbin_file.write((char*)&Result,sizeof(StabilityPointType));
         }
@@ -290,8 +339,10 @@ void CalcBorder::stopMPI()
     }
 }
 
-void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityPointType *Pdvar, boost::qvm::mat<double,3,3> *Svar, const uint_fast32_t &Nvar)
-{
+void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar,
+ 										StabilityPointType *Pdvar,
+ 										boost::qvm::mat<double,3,3> *Svar,
+ 											const uint_fast32_t &Nvar){
     //createPoints3D();
     //createIMatrix();
     char filename[256]="";
@@ -321,7 +372,7 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityP
     //std::cerr<<"Q0\n";
     MDC->calculateActualStiffness();
     //ElasticModules3D b;toElastic3D(MDC->StiffnessVoigt, b);
-    MDC->reachSpecifiedStress();
+    MDC->reachSpecifiedStress(); //поджатие связей
     dG0 = MDC->dG0;
     std::cerr<<"dG0 "<<dG0.a[0][0]<<" "<<dG0.a[0][1]<<" "<<dG0.a[0][2]
     <<" "<<dG0.a[1][0]<<" "<<dG0.a[1][1]<<" "<<dG0.a[1][2]<<" "<<dG0.a[2][0]<<" "<<dG0.a[2][1]<<" "<<dG0.a[2][2]<<"\n";
@@ -349,7 +400,9 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityP
             Task = getNextTask();
             //MDC->eXYMax = 2.0*MDC->LV[1].a[1]*Task.D.a[1][1]/(MDC->LV[0].a[0]*Task.D.a[0][0]);
             //Task.D.a[0][1] = (fabs(Task.D.a[0][1])<MDC->eXYMax)?Task.D.a[0][1]:(Task.D.a[0][1]-MDC->eXYMax*int_fast32_t(Task.D.a[0][1]/MDC->eXYMax));
-            std::cerr<<"Task.D0 "<<NSended<<" "<<NReceived<<" "<<NSR<<" "<<Task.i<<" "<<Task.D.a[0][0]-1<<" "<<Task.D.a[1][1]-1<<" "<<Task.D.a[2][2]-1<<"\n";
+            std::cerr<<"Task.D0 "<<NSended<<" "<<NReceived<<" "<<NSR<<" "
+			<<Task.i<<" "<<Task.D.a[0][0]-1<<" "<<Task.D.a[1][1]-1
+			<<" "<<Task.D.a[2][2]-1<<"\n";
 
             MDC->createLattice3DT(Task.D);
             MDC->setTemperatureNormal();
@@ -363,6 +416,10 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityP
 
             MDC->Ek0 = MDC->Ek;
             MDC->Ep0 = MDC->Ep;
+
+			double PotEnergy = MDC->Ep / MDC->N;
+
+			// Result.PotEnergy = Energy;
             if(MDC->NM==1)goto SkipCalc0;
             for(i=0; i<Task.Step; ++i)
             {
@@ -378,7 +435,9 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityP
                 }
                 if(MDC->Ek>1.01*MDC->Ek0)
                 {
-                    break;
+					PotEnergy = MDC->Ep / MDC->N;
+					// Result.PotEnergy = PotEnergy;
+					break;
                 }
             }
 SkipCalc0:;
@@ -386,13 +445,26 @@ SkipCalc0:;
             Result.Stability = (i==Task.Step)?2:1;
             Result.StabilityTime = MDC->t;
             Result.StabilitySteps = i;
+			Result.NumberBonds = MDC->NM;
+			Result.PotEnergy = PotEnergy;
+			// Result.PotEnergy = Energy;
 
             PdataR[Result.i] = Result;
-            ResultiC_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<int(Result.Stability)<<" "<<Result.StabilitySteps<<" "<<Result.StabilityTime<<"\n";
+            ResultiC_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "
+			<<Task.D.a[2][2]<<" "<<int(Result.Stability)<<" "<<
+			Result.StabilitySteps<<" "<<Result.StabilityTime<<" "<<
+			Result.PotEnergy<<" "<<Result.NumberBonds<<" num "<<"\n";
+
             if(int(Result.Stability)==1)
-                ResultiUStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<Result.StabilitySteps<<" "<<Result.StabilityTime<<"\n";
+                ResultiUStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "
+				<<Task.D.a[2][2]<<" "<<Result.StabilitySteps<<" "
+				<<Result.StabilityTime<<" "<<Result.PotEnergy<<"\n";
+
             else if(int(Result.Stability)==2)
-                ResultiStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<Result.StabilitySteps<<" "<<Result.StabilityTime<<"\n";
+                ResultiStable_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "
+				<<Task.D.a[2][2]<<" "<<Result.StabilitySteps<<" "
+				<<Result.StabilityTime<<" "<<Result.PotEnergy<<"\n";
+
             ResultiCbin_file.write((char*)&Task,sizeof(TaskType3D));
             ResultiCbin_file.write((char*)&Result,sizeof(StabilityPointType));
 
