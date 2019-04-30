@@ -30,10 +30,11 @@ public:
     boost::qvm::vec<double,3> *e, *ein, *ea, *R, *RS;
     double *A, *Ain, *_1d_A, *P1, *P2, *CSD;
     uint_fast32_t *CSN;
-    //CalcBorder *CB;
+    // CalcBorder *CB;
     boost::random::mt19937 generator;
     boost::random::uniform_on_sphere<double> distribution;
-    boost::random::variate_generator<boost::random::mt19937&, boost::random::uniform_on_sphere<double> > distr;
+    boost::random::variate_generator<boost::random::mt19937&,
+            boost::random::uniform_on_sphere<double> > distr;
     boost::qvm::vec<double,3> aStep;
     boost::qvm::vec<uint_fast32_t,3> n, nCenter;
     boost::qvm::mat<double,3,3> Stress;
