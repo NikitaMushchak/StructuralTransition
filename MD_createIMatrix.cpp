@@ -10,7 +10,10 @@ void MD::createIMatrix(const bool &recreate)
     uint_fast32_t i=0, j=0, tempNM, calc;
     //for(uint8_t i=0;i<4;++i)
     if(M==nullptr)M = new boost::qvm::vec<int_fast32_t,3>[N];
-    else if(recreate){delete []M;M = new boost::qvm::vec<int_fast32_t,3>[N];}
+    else if(recreate){
+        delete []M;
+        M = new boost::qvm::vec<int_fast32_t,3>[N];
+    }
     //std::cerr<<"M0 "<<R[iCenter].a[0]<<" "<<R[iCenter].a[1]<<" "<<iCenter<<" "<<N<<" "<<n.a[0]<<" "<<n.a[1]<<"\n";
     for(uint_fast32_t i=0; i<N; ++i)
     {
@@ -18,13 +21,13 @@ void MD::createIMatrix(const bool &recreate)
         ri = R[i]-R[iCenter];
         rmm = boost::qvm::mag_sqr(ri);
         //std::cerr<<"M1 "<<i<<" "<<r.a[0]<<" "<<r.a[1]<<" "<<rmm<<" "<<AA<<"\n";
-        if(rmm<P_aa_cut && i!=iCenter)// && rmm>1e-10)
+        if(rmm<P_aa_cut && i!=iCenter && rmm>1e-10)
         {
             //M[NM].a[2] = int_fast32_t(i*_1d_n.a[0]*_1d_n.a[1])-int_fast32_t(nCenter.a[2]);
             //M[NM].a[1] = int_fast32_t((i-M[NM].a[2]*n.a[1])*_1d_n.a[0])-int_fast32_t(nCenter.a[1]);
             //M[NM].a[0] = int_fast32_t(i-M[NM].a[2]*n.a[1]*n.a[0]-M[NM].a[1]*n.a[0])-int_fast32_t(nCenter.a[0]);
             M[NM] = Ri[i]-Ri[iCenter];
-            //std::cerr<<"M "<<NM<<" "<<M[NM].a[0]<<" "<<M[NM].a[1]<<" "<<M[NM].a[2]<<" "<<ri.a[0]<<" "<<ri.a[1]<<" "<<ri.a[2]<<" "<<rmm<<" "<<iCenter<<" "<<P_aa_cut<<"\n";
+            std::cerr<<"M "<<NM<<" "<<M[NM].a[0]<<" "<<M[NM].a[1]<<" "<<M[NM].a[2]<<" "<<ri.a[0]<<" "<<ri.a[1]<<" "<<ri.a[2]<<" "<<rmm<<" "<<iCenter<<" "<<P_aa_cut<<"\n";
             ++NM;
         }
     }
@@ -60,7 +63,7 @@ void MD::createIMatrix(const bool &recreate)
         tempM[tempNM+NMd2] = -M[i];
         //std::cerr<<"M "<<i<<" "<<tempNM<<" "<<tempM[tempNM].a[0]<<" "<<tempM[tempNM].a[1]<<" "<<tempM[tempNM].a[2]<<"\n";
         ++tempNM;
-MD_createIMatrix_Next:
+        MD_createIMatrix_Next:
         ;
     }
     delete []M;
@@ -79,5 +82,5 @@ MD_createIMatrix_Next:
     //for(uint_fast32_t i=0; i<NM; ++i)
     //    if(abs(M[i].a[0])>N || abs(M[i].a[1])>N || abs(M[i].a[2])>N)std::cerr<<"M "<<i<<" "<<M[i].a[0]<<" "<<M[i].a[1]<<" "<<M[i].a[2]<<"\n";
 
-    //std::cin.get();
+    std::cin.get();
 }

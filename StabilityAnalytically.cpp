@@ -49,7 +49,7 @@ StabilityAnalytically::StabilityAnalytically()
     P_a2 = MC_2ds3;
     P_alfa2/=P_a2;
 
-    P_aCut = 0;
+    P_aCut = 2.;
     P_P1 = 2.0*P_D*P_alfa;
     P_P2 = 2.0*P_D*P_alfa*P_alfa;
     P_F = 2.0*P_D*P_alfa;
@@ -358,21 +358,22 @@ void StabilityAnalytically::calculateForces()
     P2[0]=0;
     for (uint_fast32_t i=1; i<RSN; ++i)
     {
-        //std::cerr<<"F "<<i<<" "<<A[i]<<"\n";
+        std::cerr<<"F "<<i<<" "<<A[i]<<"\n";
         //std::cin.get();
         if(A[i] < P_aCut)
         {
             exp_b_ra = exp( P_alfa*(P_a-A[i]) );
             exp_a2_r = exp(P_alfa2 * (P_a2 - A[i]) *(A[i] - P_a2));
             // (P_F*exp_a_r*(exp_a_r-1.0) + P_F2 * exp_a2_r *( P_a2 - dr_m)//
-            P1[i] = -P_P1*( exp_b_ra - 1.0 )*exp_b_ra
-                        -2. * P_F2 * exp_a2_r;  //���� ��������������
-            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra +
-                        2. * P_D2 * exp_a2_r* (-P_alfa2 + 2. * P_alfa2*P_alfa2*
-                        A[i]*A[i]); //��������� ������ ���� �� 1 �� Nvect
-            E += P_D*( exp_b_ra - 2.0 )*exp_b_ra + P_D2 * exp_a2_r;
+            P1[i] = P_P1*( exp_b_ra - 1.0 )*exp_b_ra;
+                        // -2. * P_F2 * exp_a2_r;  //���� ��������������
+            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra ;
+                        //+2. * P_D2 * exp_a2_r* (-P_alfa2 + 2. * P_alfa2*P_alfa2*
+                        //A[i]*A[i]); //��������� ������ ���� �� 1 �� Nvect
+            E += P_D*( exp_b_ra - 2.0 )*exp_b_ra;
+                        //+ P_D2 * exp_a2_r;
 
-            // std::cerr<<"F "<<i<<" "<<A[i]<<" "<<P1[i]<<" "<<P2[i]<<"\n";
+            std::cerr<<"F "<<i<<" "<<A[i]<<" "<<P1[i]<<" "<<P2[i]<<"\n";
 
         }
         else

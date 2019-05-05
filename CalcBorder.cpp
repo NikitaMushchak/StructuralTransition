@@ -104,8 +104,8 @@ void CalcBorder::createPoints3D()
     _1d_n.a[0] = 1.0/double(n.a[0]);
     _1d_n.a[1] = 1.0/double(n.a[1]);
     _1d_n.a[2] = 1.0/double(n.a[2]);
-    //AA = boost::qvm::mag_sqr(eStep);
-    AA = boost::qvm::X(eStep)*boost::qvm::X(eStep)*0.5*2.1*2.1;
+    AA = boost::qvm::mag_sqr(eStep);
+    // AA = boost::qvm::X(eStep)*boost::qvm::X(eStep)*0.5*2.1*2.1; //БЫЛО ЭТО!!!!
     //NL = 2*boost::qvm::Y(n)*(boost::qvm::X(n)-1)+2*(boost::qvm::Y(n)-1)*(2*boost::qvm::X(n)-1)+10;
     std::cerr<<"Number "<<N<<"\n";
     P = new boost::qvm::vec<double,3>[N];
@@ -379,8 +379,9 @@ void CalcBorder::createIMatrix()
         //if(i==iCenter)continue;
         r = P[i]-P[iCenter];
         rmm = boost::qvm::mag_sqr(r);
-        //std::cerr<<"M1 "<<i<<" "<<r.a[0]<<" "<<r.a[1]<<" "<<rmm<<" "<<AA<<"\n";
-        if(rmm<AA)// && rmm>1e-10)
+        std::cerr<<"M1 "<<i<<" "<<r.a[0]<<" "<<r.a[1]<<" "<<rmm<<" "<<AA<<"\n";
+        // if(rmm < AA && rmm>1e-10)
+        if(rmm < AA && i!=iCenter && rmm>1e-10)
         {
             //M[NM].a[2] = int_fast32_t(i*_1d_n.a[0]*_1d_n.a[1])-int_fast32_t(nCenter.a[2]);
             //M[NM].a[1] = int_fast32_t((i-M[NM].a[2]*n.a[1])*_1d_n.a[0])-int_fast32_t(nCenter.a[1]);
@@ -394,7 +395,7 @@ void CalcBorder::createIMatrix()
             //std::cin.get();
         }
     }
-    //std::cin.get();
+    std::cin.get();
 }
 
 void CalcBorder::checkStability(){
