@@ -25,9 +25,9 @@ StabilityAnalytically::StabilityAnalytically()
     CSD = nullptr;
     CSN = nullptr;
 
-    n.a[0] = 15;
-    n.a[1] = 15;
-    n.a[2] = 15;
+    n.a[0] = 50;
+    n.a[1] = 50;
+    n.a[2] = 50;
 
 
 
@@ -161,7 +161,8 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
     boost::qvm::mat<double,3,3> defGrad=MC_0T33, dG;
     double _1d_N = 1.0/double(Nvar);
 
-    std::ofstream Res_File ("Res_file");
+    std::ofstream Res_File ("Res_file.txt");
+    std::ofstream Res_Stab_File ("Res_Stab_file.txt");
     for(uint_fast32_t i=0; i<Nvar; ++i){
 
         boost::qvm::set_identity(defGrad);
@@ -173,8 +174,14 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
         checkStability(Pdvar[i]);
 
 
-        Res_File<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]<<" "
+        Res_Stab_File<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]<<" "
                 <<int(Pdvar[i].Stability)<<"\n";
+
+        if(int(Pdvar[i].Stability)==2){
+        Res_File<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]<<" "
+                        <<int(Pdvar[i].Stability)<<"\n";
+        }
+
         if(i%10000==0)
         std::cerr<<"Done "<<100.0*i/double(Nvar)<<"%\n";
 
@@ -358,22 +365,22 @@ void StabilityAnalytically::calculateForces()
     P2[0]=0;
     for (uint_fast32_t i=1; i<RSN; ++i)
     {
-        std::cerr<<"F "<<i<<" "<<A[i]<<"\n";
+        //std::cerr<<"F "<<i<<" "<<A[i]<<"\n";
         //std::cin.get();
         if(A[i] < P_aCut)
         {
             exp_b_ra = exp( P_alfa*(P_a-A[i]) );
             exp_a2_r = exp(P_alfa2 * (P_a2 - A[i]) *(A[i] - P_a2));
             // (P_F*exp_a_r*(exp_a_r-1.0) + P_F2 * exp_a2_r *( P_a2 - dr_m)//
-            P1[i] = P_P1*( exp_b_ra - 1.0 )*exp_b_ra;
-                        // -2. * P_F2 * exp_a2_r;  //���� ��������������
-            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra ;
-                        //+2. * P_D2 * exp_a2_r* (-P_alfa2 + 2. * P_alfa2*P_alfa2*
-                        //A[i]*A[i]); //��������� ������ ���� �� 1 �� Nvect
-            E += P_D*( exp_b_ra - 2.0 )*exp_b_ra;
-                        //+ P_D2 * exp_a2_r;
+            P1[i] = P_P1*( exp_b_ra - 1.0 )*exp_b_ra
+                        -2. * P_F2 * exp_a2_r;  //���� ��������������
+            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra
+                        +2. * P_D2 * exp_a2_r* (-P_alfa2 + 2. * P_alfa2*P_alfa2*
+                        A[i]*A[i]); //��������� ������ ���� �� 1 �� Nvect
+            E += P_D*( exp_b_ra - 2.0 )*exp_b_ra
+                        + P_D2 * exp_a2_r;
 
-            std::cerr<<"F "<<i<<" "<<A[i]<<" "<<P1[i]<<" "<<P2[i]<<"\n";
+            // std::cerr<<"F "<<i<<" "<<A[i]<<" "<<P1[i]<<" "<<P2[i]<<"\n";
 
         }
         else
@@ -384,10 +391,15 @@ void StabilityAnalytically::calculateForces()
         }
 
         Stress += (_1d_V*A[i]*P1[i])*tens(e[i],e[i]);
-        std::cerr<<"Stress "<<_1d_V*A[i]*P1[i]<<" "<<Stress.a[0][0]<<" "
-            <<Stress.a[0][1]<<" "<<Stress.a[1][0]<<" "<<Stress.a[1][1]<<"\n";
+        // std::cerr<<"Stress "<<_1d_V<<" "<<A[i]<<" "<<P1[i]
+        //             <<" "<<Stress.a[0][0]<<" "
+        //     <<Stress.a[0][1]<<" "<<Stress.a[1][0]<<" "<<Stress.a[1][1]<<"\n";
+
     }
-    //std::cin.get();
+    // std::cerr<<"Stress "//<<_1d_V*A[i]*P1[i]
+    //             <<" "<<Stress.a[0][0]<<" "
+    //     <<Stress.a[0][1]<<" "<<Stress.a[1][0]<<" "<<Stress.a[1][1]<<"\n";
+    // std::cin.get();
 }
 
 void StabilityAnalytically::findCoordinationalSpheres()
@@ -408,7 +420,9 @@ void StabilityAnalytically::findCoordinationalSpheres()
     {
         dr_mm = boost::qvm::mag_sqr(R[i]-R[iCenter]);
 
-        //std::cerr<<"R "<<boost::qvm::X(R[i]-R[iCenter])<<" "<<boost::qvm::Y(R[i]-R[iCenter])<<" "<<boost::qvm::Z(R[i]-R[iCenter])<<" "<<dr_mm<<"\n";
+        //std::cerr<<"R "<<boost::qvm::X(R[i]-R[iCenter])<<" "
+        // <<boost::qvm::Y(R[i]-R[iCenter])<<" "<<boost::qvm::Z(R[i]-R[iCenter])
+        // <<" "<<dr_mm<<"\n";
         //std::cin.get();
         for(uint_fast32_t j=0; j<CSDN; ++j)
         {
@@ -490,7 +504,8 @@ std::cerr<<" . ";
         //std::cerr<<"R1\n";
         dr = R[i]-R[iCenter];
         dr_mm = boost::qvm::mag_sqr(dr);
-        //std::cerr<<"SVp "<<i<<" "<<dr_mm<<" "<<boost::qvm::X(R[i]-R[iCenter])<<" "<<boost::qvm::Y(R[i]-R[iCenter])<<"\n";
+        //std::cerr<<"SVp "<<i<<" "<<dr_mm<<" "<<boost::qvm::X(R[i]-R[iCenter])
+        // <<" "<<boost::qvm::Y(R[i]-R[iCenter])<<"\n";
 
         for(uint_fast32_t j=0; j<MaxCSDN; ++j)
         {
@@ -525,9 +540,9 @@ SkipVector:;
         }
     }
     //std::cin.get();
-    //std::cerr<<"Sphere "<<RSN<<"\n";
+    std::cerr<<"Sphere "<<RSN<<"\n";
 
-    /*for(uint_fast32_t i=0; i<MaxCoordSphereNumber; ++i)
+    /*for(uint_fast32_t i=0; i<MaxCSDN; ++i)
     {
         std::cerr<<"Q6 "<<i<<" "<<SphereVectorsPosition[i]<<" "<<SphereVectorsPosition[i+1]<<" "<<VectorNumber<<"\n";
         for(uint_fast32_t j=SphereVectorsPosition[i]; j<SphereVectorsPosition[i+1]; ++j)
@@ -548,7 +563,7 @@ SkipVector:;
         CSD[i] = sqrt(CSD[i]);
         // std::cerr<<"Sphere "<<i<<" "<<CSD[i]<<" "<<CSD[i]*CSD[i]<<"\n";
     }
-    //std::cin.get();
+    // std::cin.get();
     std::cerr<<"OK"<<std::endl;
 }
 
@@ -767,6 +782,7 @@ void StabilityAnalytically::createFCCLattice()
     //V = R1.a[0]*R2.a[1]-R1.a[1]*R2.a[0];
     //V=boost::qvm::mag(boost::qvm::cross(R[n.a[0]*(n.a[1]-1)]-R[0],));
     _1d_V = 1.0/V;
+
     std::cerr<<"."<<std::endl;
         //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<"\n";
     std::cerr<<"FCC!!!!!!!!! = "<<" N = "<<N<<" V = "<<V<<" iCenter = "<<iCenter<<"\n";
@@ -856,7 +872,7 @@ void StabilityAnalytically::reachSpecifiedStress(const boost::qvm::mat<double,3,
         calculateForces();
         // std::cerr<<".";
         dS=Stress-Svar;
-        std::cout<<"dS  = "<<dS.a[0][0]<<" "<<dS.a[0][0]<<std::endl;
+        std::cout<<"dS  = "<<dS.a[0][0]<<" "<<dS.a[1][1]<<std::endl;
         if(fabs(dS.a[0][0])*fabs(dS.a[1][1])<1e-25)
             break;
 
