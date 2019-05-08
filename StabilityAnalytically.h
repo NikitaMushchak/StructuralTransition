@@ -41,7 +41,7 @@ public:
     boost::qvm::mat<double,6,6> StiffnessVoigt, DuctilityVoigt;
     boost::qvm::mat<double,9,9> Stiffness, Ductility;
 
-    double V, _1d_V, E, NearZero, NearSphere,
+    double V0, V, _1d_V, E, NearZero, NearSphere,
     P_aCut, P_P1, P_P2, P_D, P_D2, P_alfa, P_alfa2, P_a,P_a2,
     EpsDeform_const, eXYMax;
 
