@@ -25,9 +25,9 @@ StabilityAnalytically::StabilityAnalytically()
     CSD = nullptr;
     CSN = nullptr;
 
-    n.a[0] = 50;
-    n.a[1] = 50;
-    n.a[2] = 50;
+    n.a[0] = 70;
+    n.a[1] = 70;
+    n.a[2] = 70;
 
 
 
@@ -44,7 +44,7 @@ StabilityAnalytically::StabilityAnalytically()
     P_a = 1.0;
     P_alfa = 13.0/P_a;
 
-    P_alfa2 =350.0*MC_2ds3;
+    P_alfa2 =350.0*P_a2;
 
     P_a2 = MC_2ds3;
     P_alfa2/=P_a2;
@@ -386,13 +386,16 @@ void StabilityAnalytically::calculateForces()
             exp_b_ra = exp( P_alfa*(P_a-A[i]) );
             exp_a2_r = exp(P_alfa2 * (P_a2 - A[i]) *(A[i] - P_a2));
             // (P_F*exp_a_r*(exp_a_r-1.0) + P_F2 * exp_a2_r *( P_a2 - dr_m)//
-            P1[i] = -P_P1*( exp_b_ra - 1.0 )*exp_b_ra;
-                        // -2. * P_F2 * exp_a2_r;  //���� ��������������
-            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra;
-                        // +2. * P_D2 * exp_a2_r* (-P_alfa2 + 2. * P_alfa2*P_alfa2*
-                        // A[i]*A[i]); //��������� ������ ���� �� 1 �� Nvect
-            E += P_D*( exp_b_ra - 2.0 )*exp_b_ra;
-                    //    + P_D2 * exp_a2_r;
+            //Сила
+            P1[i] = -P_P1*( exp_b_ra - 1.0 )*exp_b_ra
+                        + P_F2 * exp_a2_r * (P_a2 - A[i]);  //���� ��������������
+            //Жесткость
+            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra
+                        +2.* P_alfa2* P_D2 * exp_a2_r* (-1. +
+                        2.* P_alfa2*P_a2*P_a2 -4.*P_a2*P_alfa2*A[i]+2.*P_alfa2*A[i]*A[i]);
+                        ; //��������� ������ ���� �� 1 �� Nvect
+            E += P_D*( exp_b_ra - 2.0 )*exp_b_ra
+                                       + P_D2 * exp_a2_r;
 
             // std::cerr<<"F "<<i<<" "<<A[i]-1<<" "<<P_a<<" "<<P1[i]<<" "<<P2[i]<<" "<<_1d_V<<"\n";
 
