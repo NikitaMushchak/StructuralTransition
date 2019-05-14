@@ -31,7 +31,8 @@ void MD::calculateForcesIM()
             vp.a[0] = int_fast32_t(Rj.a[0]<0)-int_fast32_t(Rj.a[0]>=n.a[0]);
             vp.a[1] = int_fast32_t(Rj.a[1]<0)-int_fast32_t(Rj.a[1]>=n.a[1]);
             vp.a[2] = int_fast32_t(Rj.a[2]<0)-int_fast32_t(Rj.a[2]>=n.a[2]);
-            j = I[Rj.a[0]+vp.a[0]*n.a[0]+(Rj.a[1]+vp.a[1]*n.a[1])*n.a[0]+(Rj.a[2]+vp.a[2]*n.a[2])*n.a[1]*n.a[0]];
+            j = I[Rj.a[0]+vp.a[0]*n.a[0]+(Rj.a[1]+vp.a[1]*n.a[1])*n.a[0]+
+                                    (Rj.a[2]+vp.a[2]*n.a[2])*n.a[1]*n.a[0]];
             ps = double(vp.a[0])*PS[0]+double(vp.a[1])*PS[1]+double(vp.a[2])*PS[2];
             //std::cerr<<"F0 "<<i<<" "<<j<<" "<<vp.a[0]<<" "<<vp.a[1]<<" "<<Rj.a[0]<<" "<<Rj.a[1]<<" "<<n.a[0]<<" "<<n.a[1]
             //<<" "<<ps.a[0]<<" "<<ps.a[1]<<"\n";
@@ -47,7 +48,8 @@ void MD::calculateForcesIM()
                 exp_a_r = exp(P_alfa*(P_a-dr_m));
 				exp_a2_r = exp(P_alfa2 * (P_a2 - dr_m) *(dr_m - P_a2));
                 ///C_coeff = _1d_r*_1d_r*Potential_F*exp_a_r*(Potential_alfa*(2.0*exp_a_r-1.0) + _1d_r*(exp_a_r-1.0));
-                f = ((P_F*exp_a_r*(exp_a_r-1.0) + P_F2 * exp_a2_r *( P_a2 - dr_m))*_1d_r)*dr;
+                f = ((P_F*exp_a_r*(exp_a_r-1.0) - P_F2 * exp_a2_r
+                                                    *( P_a2 - dr_m))*_1d_r)*dr;
                 F[i]-=f;
                 F[j]+=f;
 
@@ -99,8 +101,10 @@ void MD::calculateStateIM()
                 //std::cerr<<i<<" "<<Rj.a[0]<<" "<<Rj.a[1]<<" "<<Rj.a[2]<<" "<<vp.a[0]<<" "<<vp.a[1]<<" "<<vp.a[2]<<" "<<Rj.a[0]+vp.a[0]*n.a[0]+(Rj.a[1]+vp.a[1]*n.a[1])*n.a[0]+(Rj.a[2]+vp.a[2]*n.a[2])*n.a[1]*n.a[0]<<" "<<N<<"\n";
             //    std::cerr<<i<<" "<<m<<" "<<Ri[i].a[0]<<" "<<Ri[i].a[1]<<" "<<Ri[i].a[2]<<" "<<M[m].a[0]<<" "<<M[m].a[1]<<" "<<M[m].a[2]<<"\n";
             //    std::cin.get();            }
-            j = I[Rj.a[0]+vp.a[0]*n.a[0]+(Rj.a[1]+vp.a[1]*n.a[1])*n.a[0]+(Rj.a[2]+vp.a[2]*n.a[2])*n.a[1]*n.a[0]];
-            ps = double(vp.a[0])*PS[0]+double(vp.a[1])*PS[1]+double(vp.a[2])*PS[2];
+            j = I[Rj.a[0]+vp.a[0]*n.a[0]+(Rj.a[1]+vp.a[1]*n.a[1])*n.a[0]+
+                                        (Rj.a[2]+vp.a[2]*n.a[2])*n.a[1]*n.a[0]];
+            ps = double(vp.a[0])*PS[0]+double(vp.a[1])*PS[1]+
+                                                        double(vp.a[2])*PS[2];
             dr = R[j]-R[i]-ps;
 
 
@@ -110,8 +114,10 @@ void MD::calculateStateIM()
                 exp_a_r = exp(P_alfa*(P_a-dr_m));
 				exp_a2_r = exp(P_alfa2 * (P_a2 -dr_m) *(dr_m - P_a2));
                 ///C_coeff = _1d_r*_1d_r*Potential_F*exp_a_r*(Potential_alfa*(2.0*exp_a_r-1.0) + _1d_r*(exp_a_r-1.0));
-                f = ((P_F*exp_a_r*(exp_a_r-1.0) + P_F2 * exp_a2_r *( P_a2 - dr_m))*_1d_r)*dr;
-                c = P_C*exp_a_r*(2.0*exp_a_r-1.0) + P_C2 *exp_a2_r*(1.0-2.0 * P_alfa2*(dr_m - P_alfa2)*(dr_m - P_alfa2));
+                f = ((P_F*exp_a_r*(exp_a_r-1.0) -
+                                    P_F2 * exp_a2_r *( P_a2 - dr_m))*_1d_r)*dr;
+                c = P_C*exp_a_r*(2.0*exp_a_r-1.0) + P_C2 *exp_a2_r*(1.0
+                            - 2.0 * P_alfa2*(dr_m - P_alfa2)*(dr_m - P_alfa2));
                 Ep += P_D*exp_a_r*(exp_a_r-2.0) + P_D2 * exp_a2_r ;
                 Stress -= tens(f,dr);
                 //S = tens(f,dr);

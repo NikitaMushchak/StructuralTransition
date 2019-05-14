@@ -199,9 +199,13 @@ TaskType3D CalcBorder::getNextTask()
         Task.Ek = 1e-6;
         //Task.Step = NStep;
 		e = (Task.D.a[0][0]+Task.D.a[1][1]+Task.D.a[2][2])*MC_1d3;
-		Task.Step = (NStepB-NStepA)*(e-0.4)/0.6+NStepA;
+		// std::cerr<<" e = "<<e<<"\n";
+		Task.Step = (NStepB-NStepA)*(e-0.4)/0.6 + NStepA;
+		// std::cerr<<"Task.Step = "<<Task.Step<<"  NStepA = "<<NStepA<<"  NStepB = "<<
+																// NStepB<<"\n";
         Task.i = NSended;
         ++NSended;
+		// std::cin.get();
     }
     else
     {
@@ -411,8 +415,10 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar,
             MDC->createIMatrix();
             //std::cerr<<"Q9"<<"\n";
             MDC->calculateStateIM();
-            //std::cerr<<"Stress "<<MDC->Stress.a[0][0]<<" "<<MDC->Stress.a[0][1]<<" "<<MDC->Stress.a[1][0]<<" "<<MDC->Stress.a[1][1]<<"\n";
-            //std::cerr<<"E "<<MDC->Ek*MDC->_1d_N<<" "<<MDC->Ep*MDC->_1d_N<<" "<<MDC->P_Cmax<<" "<<MDC->P_C<<"\n";
+            // std::cerr<<"Stress "<<MDC->Stress.a[0][0]<<" "<<MDC->Stress.a[0][1]
+					// <<" "<<MDC->Stress.a[1][0]<<" "<<MDC->Stress.a[1][1]<<"\n";
+            // std::cerr<<"E "<<MDC->Ek*MDC->_1d_N<<" "<<MDC->Ep*MDC->_1d_N<<" "
+											// <<MDC->P_Cmax<<" "<<MDC->P_C<<"\n";
 
             MDC->Ek0 = MDC->Ek;
             MDC->Ep0 = MDC->Ep;
@@ -427,7 +433,11 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar,
                 MDC->calculateForcesIM();
                 //std::cerr<<"Q10"<<"\n";
                 MDC->calculateIncrements();
-                //std::cerr<<"Q "<<MDC->t<<" "<<MDC->Ek*MDC->_1d_N<<" "<<MDC->Ek0*MDC->_1d_N<<" "<<MDC->Ep<<"\n";
+				if(Task.Step<0.){
+					std::cerr<<"Task.Step = "<<Task.Step<<"  i = "<<i<<"\n";
+				}
+                // std::cerr<<"Q "<<MDC->t<<" "<<MDC->Ek*MDC->_1d_N<<
+								// " "<<MDC->Ek0*MDC->_1d_N<<" "<<MDC->Ep<<"\n";
                 //std::cin.get();
                 if(i%100==0)
                 {

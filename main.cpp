@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
         CB.createIMatrix();
         //std::cin.get();
         //std::cerr<<"Q0\n";
-        CB.checkStability();
+        // CB.checkStability();
 
-        // CB.checkStability_MPI();
+        CB.checkStability_MPI();
     }
     else
     {
