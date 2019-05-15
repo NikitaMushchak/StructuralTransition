@@ -25,9 +25,9 @@ StabilityAnalytically::StabilityAnalytically()
     CSD = nullptr;
     CSN = nullptr;
 
-    n.a[0] = 70;
-    n.a[1] = 70;
-    n.a[2] = 70;
+    n.a[0] = 150;
+    n.a[1] = 150;
+    n.a[2] = 150;
 
 
 
@@ -44,10 +44,10 @@ StabilityAnalytically::StabilityAnalytically()
     P_a = 1.0;
     P_alfa = 13.0/P_a;
 
-    P_alfa2 =350.0*P_a2;
+    P_alfa2 =350.0;
 
     P_a2 = MC_2ds3;
-    P_alfa2/=P_a2;
+    // P_alfa2/=P_a2;
 
     P_aCut = 2.;
     P_P1 = 2.0*P_D*P_alfa;
@@ -258,6 +258,8 @@ void StabilityAnalytically::checkStability(StabilityPointType &Pd)
     {
         AA = tens(e[i],e[i]);
         // std::cerr<<"Q1 "<<i<<" "<<e[i].a[0]<<" "<<e[i].a[1]<<"\n";
+        // Q - тензор 4 ранга определяющий
+        //                          микроскопические характеристики материала
         Q += A[i]*A[i]*(P1[i]*_1d_A[i]*tens(MC_1T33,AA)+(P2[i]-P1[i]*_1d_A[i])
                                 *tens(AA,AA));
 
@@ -277,19 +279,22 @@ void StabilityAnalytically::checkStability(StabilityPointType &Pd)
 
     Pd.StabilitySteps = 1;
     Pd.Stability = 2;
-    for (int m = 0; m<10000; m++){
+    for (int m = 0; m<10000; m++){ // шаги проверки устойчивости
         res= distr();
         W.a[0] = res[0];
         W.a[1] = res[1];
         W.a[2] = res[2];
+
+        Pd.PotEnergy = E;
+        Pd.PotStress = Stress.a[0][0]*_1d_V;
 
         WW = tens(W,W);
         D = dotdot(Q,WW);
         if(fabs((boost::qvm::mag_sqr(W))-1.0)>1e-14)
         {
             std::cerr<<W.a[0]<<" "<<W.a[1]<<" "<<W.a[2]<<" "
-                        <<(boost::qvm::mag_sqr(W))-1.0<<"\n";
-            std::cin.get();
+                                        <<(boost::qvm::mag_sqr(W))-1.0<<"\n";
+            // std::cin.get();
         }
 
 
@@ -305,6 +310,10 @@ void StabilityAnalytically::checkStability(StabilityPointType &Pd)
         {
             Pd.StabilitySteps = 0;
             Pd.Stability = 1;
+
+            Pd.PotEnergy = E;
+            Pd.PotStress = Stress.a[0][0]*_1d_V;
+
             break;
         }
     }
@@ -377,6 +386,8 @@ void StabilityAnalytically::calculateForces()
     //std::cerr<<"F "<<RSN<<"\n";
     P1[0]=0;
     P2[0]=0;
+
+    // std::ofstream potFile("pot.txt");
     for (uint_fast32_t i=1; i<RSN; ++i)
     {
         //std::cerr<<"F "<<i<<" "<<A[i]<<"\n";
@@ -391,14 +402,15 @@ void StabilityAnalytically::calculateForces()
                         + P_F2 * exp_a2_r * (P_a2 - A[i]);  //���� ��������������
             //Жесткость
             P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra
-                        +2.* P_alfa2* P_D2 * exp_a2_r* (-1. +
-                        2.* P_alfa2*P_a2*P_a2 -4.*P_a2*P_alfa2*A[i]+2.*P_alfa2*A[i]*A[i]);
+            /*Было +*/   +2.* P_alfa2* P_D2 * exp_a2_r* (-1. +
+                        2.* P_alfa2*P_a2*P_a2 - 4.*P_a2*P_alfa2*A[i]+
+                        2.*P_alfa2*A[i]*A[i]);
                         ; //��������� ������ ���� �� 1 �� Nvect
             E += P_D*( exp_b_ra - 2.0 )*exp_b_ra
                                        + P_D2 * exp_a2_r;
 
             // std::cerr<<"F "<<i<<" "<<A[i]-1<<" "<<P_a<<" "<<P1[i]<<" "<<P2[i]<<" "<<_1d_V<<"\n";
-
+            // potFile<<A[i]<<" "<<E<<" "<<P1[i]<<" "<<P2[i]<<"\n";
         }
         else
         {
@@ -420,6 +432,7 @@ void StabilityAnalytically::calculateForces()
     //             <<" "<<Stress.a[0][0]<<" "
     //     <<Stress.a[0][1]<<" "<<Stress.a[1][0]<<" "<<Stress.a[1][1]<<"\n";
     //std::cin.get();
+    // potFile.close();
 }
 
 void StabilityAnalytically::findCoordinationalSpheres()
@@ -428,14 +441,14 @@ void StabilityAnalytically::findCoordinationalSpheres()
     CSD = new double[N];
     CSN = new uint_fast32_t[N];
     boost::qvm::vec<double,3> dr;
-    std::cerr<<" . ";
+    // std::cerr<<" . ";
     double dr_mm;
     bool find;
     //std::cerr<<"Q3"<<CoordSphereParticlesNumber<<"\n";
     CSDN = 0;
     memset(CSD, 0, N*sizeof(double));
     memset(CSN, 0, N*sizeof(uint_fast32_t));
-    std::cerr<<" . ";
+    // std::cerr<<" . ";
     for(uint_fast32_t i=0; i<N; ++i)
     {
         dr_mm = boost::qvm::mag_sqr(R[i]-R[iCenter]);
@@ -453,7 +466,7 @@ void StabilityAnalytically::findCoordinationalSpheres()
                 goto FindSphere;
             }
         }
-        std::cerr<<" . ";
+        // std::cerr<<" . ";
         CSD[CSDN] = dr_mm;
         //std::cerr<<"W "<<i<<" "<<CSD[CSDN]<<" "<<CSDN<<"\n";
         ++CSN[CSDN];
@@ -464,7 +477,7 @@ FindSphere:
     //std::cerr<<"CoordSphereDistanceNumber "<<CSDN<<"\n";
 
     uint_fast32_t ntmp;
-    std::cerr<<" . ";
+    // std::cerr<<" . ";
     do
     {
         find=false;
@@ -484,7 +497,7 @@ FindSphere:
         }
     }
     while(find);
-std::cerr<<" . ";
+// std::cerr<<" . ";
     double *tempCDS = new double[MaxCSDN];
     memcpy(tempCDS, CSD, MaxCSDN*sizeof(double));
     delete[] CSD;
@@ -571,7 +584,7 @@ SkipVector:;
         }
         std::cin.get();
     }/**/
-    std::cerr<<" . ";
+    // std::cerr<<" . ";
     delete[] SVp;
     SVp = nullptr;
     delete[] SVc;

@@ -10,6 +10,7 @@ struct StabilityPointType
     int_fast32_t PointType, i;
     uint_fast8_t Stability;
     double PotEnergy;
+    double PotStress;
 };
 
 struct ElasticModules2D

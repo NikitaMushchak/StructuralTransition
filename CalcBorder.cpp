@@ -5,15 +5,15 @@ CalcBorder::CalcBorder()
     //ctor
     SA = nullptr;
     MDC = nullptr;
-    boost::qvm::X(e[0])= -0.7;
-    boost::qvm::Y(e[0])= -0.7;//boost::qvm::X(e[0]);//-0.6;
-    boost::qvm::Z(e[0])= -0.7;//boost::qvm::X(e[0])*(MC_s6 - 3.)/(MC_2s3 - 3.);//-0.6; // -0.6
-    boost::qvm::X(e[1])= 0.4;
-    boost::qvm::Y(e[1])= 0.4;//boost::qvm::X(e[1]);//-0.1;
-    boost::qvm::Z(e[1])= 0.4;//boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
-    boost::qvm::X(n) = 10;
-    boost::qvm::Y(n) = 10;//2*uint_fast32_t(X(n)*MC_1ds3);
-    boost::qvm::Z(n) = 10;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::X(e[0])= -0.4;
+    boost::qvm::Y(e[0])= boost::qvm::X(e[0]);//-0.6;
+    boost::qvm::Z(e[0])= boost::qvm::X(e[0])*(MC_s6 - 3.)/(MC_2s3 - 3.);//-0.6; // -0.6
+    boost::qvm::X(e[1])= 0.8; // Было 0.3 для линии ГЦК-ОЦК
+    boost::qvm::Y(e[1])= boost::qvm::X(e[1]);//-0.1;
+    boost::qvm::Z(e[1])= boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
+    boost::qvm::X(n) = 50; //размер образца
+    boost::qvm::Y(n) = 50;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::Z(n) = 50;//2*uint_fast32_t(X(n)*MC_1ds3);
     BorderPrecision = 1e-2;
     NStepA = 5000;
 	NStepB = 1000;
@@ -421,12 +421,14 @@ void CalcBorder::checkStability(){
     std::ofstream ResultC_file(filename);
     for(uint_fast32_t i=0; i<N; ++i)
     {
-         if(Pdata[i].Stability==2)
-        ResultC_file<<i<<" "<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]
-            <<" "<<int_fast32_t(Pdata[i].Stability)<<" "
-            <<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
+        // if(Pdata[i].Stability==2)
+            ResultC_file<<i<<" "<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]
+                <<" "<<int_fast32_t(Pdata[i].Stability)<<" "
+                <<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<
+                " energy stress "<<Pdata[i].PotEnergy<<" "<<Pdata[i].PotStress<<"\n";
     }
     ResultC_file.close();
+    return ;
     findBorder();
     preciseBorderCreate();
     strcpy(filename, "./");
@@ -440,6 +442,7 @@ void CalcBorder::checkStability(){
         ResultBc_file<<Pbc[i].a[0]<<" "<<Pbc[i].a[1]<<" "<<Pbc[i].a[2]<<"\n";
     }
     ResultBc_file.close();
+    std::cerr<<"Precise Border ...";
     preciseBorderCalculate();
     strcpy(filename, "./");
     strcat(filename, "/ResultBcV.txt");
@@ -450,6 +453,7 @@ void CalcBorder::checkStability(){
     }
 
     ResultBcL_file.close();
+    std::cerr<<"OK!";
 }
 
 void CalcBorder::checkStabilityMD()
