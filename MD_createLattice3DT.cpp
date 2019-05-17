@@ -11,12 +11,9 @@ void MD::createLattice3DT(const boost::qvm::mat<double,3,3> &dG)
     n.a[1] += n.a[1]%2;
     n.a[2] += n.a[2]%2;
 
-    if(n.a[0]<10)
-        n.a[0]=8;
-    if(n.a[1]<10)
-        n.a[1]=8;
-    if(n.a[2]<10)
-        n.a[2]=8;
+    if(n.a[0]<10)n.a[0]=8;
+    if(n.a[1]<10)n.a[1]=8;
+    if(n.a[2]<10)n.a[2]=8;
     //ns.a[0] = n.a[0]+2*uint_fast32_t(P_a_cut/LV[0].a[0])+1;
     //ns.a[1] = n.a[1]+2*uint_fast32_t(P_a_cut/LV[1].a[1])+1;
     PS[0] = LV[0]*double(n.a[0]);

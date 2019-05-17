@@ -19,7 +19,7 @@
 #include "DataTypes.h"
 // Type of val --- unsigned long long
 
-const double MC_s6 = sqrt(6.0);
+
 const double MC_1d3 = 1.0/3.0;
 const double MC_1d6 = 1.0/6.0;
 const double MC_1d9 = 1.0/9.0;
@@ -30,6 +30,7 @@ const double MC_2d6 = 2.0/6.0;
 const double MC_1ds3 = 1.0/sqrt(3.0);
 const double MC_2ds3 = 2.0/sqrt(3.0);
 const double MC_s3 = sqrt(3.0);
+const double MC_s6 = sqrt(6.0);
 const double MC_s3d2 = sqrt(3.0)/2.0;
 const double MC_s3d3 = sqrt(3.0)/3.0;
 const double MC_s3d4 = sqrt(3.0)/4.0;

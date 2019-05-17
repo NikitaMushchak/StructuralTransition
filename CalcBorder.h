@@ -18,8 +18,8 @@ class CalcBorder
 public:
     CalcBorder();
     virtual ~CalcBorder();
-    void createPoints1D();
     void createPoints2D();
+    void createPoints1D();
     void createPoints3D();
     void createPoints3DLineBCC();
     void createIMatrix();
@@ -56,7 +56,6 @@ public:
     uint_fast32_t N, NM, iCenter, NbL, NbLAll, NbcL, NSR, NStep, NStepA, NStepB;
     uint_fast32_t NSended, NReceived;
     double AA, BorderPrecision, BPBP;
-    double PotEnergy;
 
 protected:
 

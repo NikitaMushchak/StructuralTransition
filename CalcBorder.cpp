@@ -5,17 +5,17 @@ CalcBorder::CalcBorder()
     //ctor
     SA = nullptr;
     MDC = nullptr;
-    boost::qvm::X(e[0])= -0.1;
-    boost::qvm::Y(e[0])= -0.1;//boost::qvm::X(e[0]);//-0.6;
-    boost::qvm::Z(e[0])= -0.1;//boost::qvm::X(e[0])*(MC_s6 - 3.)/(MC_2s3 - 3.);//-0.6; // -0.6
-    boost::qvm::X(e[1])= 0.4;
-    boost::qvm::Y(e[1])= 0.4;//boost::qvm::X(e[1]);//-0.1;
-    boost::qvm::Z(e[1])= 0.4;//boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
-    boost::qvm::X(n) = 5;
-    boost::qvm::Y(n) = 5;//2*uint_fast32_t(X(n)*MC_1ds3);
-    boost::qvm::Z(n) = 5;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::X(e[0])= -0.2;
+    boost::qvm::Y(e[0])= boost::qvm::X(e[0]);//-0.6;
+    boost::qvm::Z(e[0])= boost::qvm::X(e[0])*(MC_s6 - 3.)/(MC_2s3 - 3.);//-0.6; // -0.6
+    boost::qvm::X(e[1])= 0.4; // Было 0.3 для линии ГЦК-ОЦК
+    boost::qvm::Y(e[1])= boost::qvm::X(e[1]);//-0.1;
+    boost::qvm::Z(e[1])= boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
+    boost::qvm::X(n) = 100;
+    boost::qvm::Y(n) = 100;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::Z(n) = 100;//2*uint_fast32_t(X(n)*MC_1ds3);
     BorderPrecision = 1e-2;
-    NStepA = 500;
+    NStepA = 1000;
 	NStepB = 1000;
     BPBP = BorderPrecision*BorderPrecision;
     ///SA = new StabilityAnalytically();
@@ -98,7 +98,6 @@ void CalcBorder::createPoints3D()
     n*=2;
     n+=MC_i1XYZV3;
     N = boost::qvm::X(n)*boost::qvm::Y(n)*boost::qvm::Z(n)/2+1;
-    // N = boost::qvm::X(n);
     //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<"\n";
     //std::cin.get();
     _1d_n.a[0] = 1.0/double(n.a[0]);
@@ -151,7 +150,7 @@ void CalcBorder::createPoints3D()
     nCenter.a[2] -= nCenter.a[2]%2;
     iCenter = I[nCenter.a[0]+nCenter.a[1]*n.a[0]+nCenter.a[2]*n.a[0]*n.a[1]];
     //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<"\n";
-    std::cerr<<"C main:"<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
+    std::cerr<<"C "<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
     //std::cin.get();
 }
 void CalcBorder::createPoints3DLineBCC()
@@ -292,10 +291,11 @@ void CalcBorder::createPoints2D()
     nCenter.a[2] -= nCenter.a[2]%2;
     iCenter = I[nCenter.a[0]+nCenter.a[1]*n.a[0]+nCenter.a[2]*n.a[0]*n.a[1]];
     //std::cerr<<"C "<<N<<" "<<eStep.a[0]<<" "<<eStep.a[1]<<" "<<eStep.a[2]<<"\n";
-    std::cerr<<"C main:"<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
-    std::cerr<<"C cent"<<nCenter.a[0]<<" "<<nCenter.a[1]<<" "<<nCenter.a[2]<<" "<<rCenter.a[0]<<" "<<rCenter.a[1]<<" "<<rCenter.a[2]<<"\n";
+    std::cerr<<"C "<<N<<" "<<n.a[0]<<" "<<n.a[1]<<" "<<n.a[2]<<" "<<iCenter<<" "<<P[iCenter].a[0]<<" "<<P[iCenter].a[1]<<" "<<P[iCenter].a[2]<<"\n";
+    //std::cerr<<"C "<<nCenter.a[0]<<" "<<nCenter.a[1]<<" "<<nCenter.a[2]<<" "<<rCenter.a[0]<<" "<<rCenter.a[1]<<" "<<rCenter.a[2]<<"\n";
     //std::cin.get();
 }
+
 
 void CalcBorder::createPoints1D()
 {
@@ -331,6 +331,7 @@ void CalcBorder::createPoints1D()
     double drrCenterMin = 1e99, drrCenter;
     boost::qvm::vec<double,2> tmp= {0,0};
     uint_fast32_t i, j, iN = 0;
+    j = 1;
     // for(j=0; j<boost::qvm::Y(n); ++j)
     // {
         boost::qvm::X(tmp) = 0.5*boost::qvm::X(eStep)*(j%2);
@@ -397,12 +398,9 @@ void CalcBorder::createIMatrix()
     //std::cin.get();
 }
 
-void CalcBorder::checkStability(){
-
-    std::cout<<"IN"<<std::endl;
-    // StabilityAnalytically SA;
+void CalcBorder::checkStability() //StabilityAnaliticly
+{
     SA->startTask();
-    std::cout<<"IN 1"<<std::endl;
     char taskdir[256]=".", filename[256]="";
     strcpy(filename, taskdir);
     strcat(filename, "/FCCSpheres.txt");
@@ -422,7 +420,7 @@ void CalcBorder::checkStability(){
     std::ofstream ResultC_file(filename);
     for(uint_fast32_t i=0; i<N; ++i)
     {
-        // if(Pdata[i].Stability==2)
+        if(Pdata[i].Stability==2)
         ResultC_file<<i<<" "<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" "<<int_fast32_t(Pdata[i].Stability)<<" "<<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<"\n";
     }
     ResultC_file.close();
