@@ -99,7 +99,7 @@ void StabilityAnalytically::startTask()
     std::cerr<<"FCC"<<std::endl;
     findCoordinationalSpheres();
     P_aCut = 0.5*(CSD[3]+CSD[4]);
-    std::cerr<<P_aCut<<"\n";
+    std::cerr<<"P_aCut "<<P_aCut<<" "<<P_aCut*P_aCut<<"\n";
     //std::cerr<<"E2\n";
     //std::cin.get();
     std::cerr<<"decompose vectors..."<<std::endl;
@@ -178,15 +178,27 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
     for(uint_fast32_t i=0; i<Nvar; ++i){
 
         boost::qvm::set_identity(defGrad);
-        defGrad.a[0][0]+=Pvar[i].a[0];
-        defGrad.a[1][1]+=Pvar[i].a[1];
-        defGrad.a[2][2]+=Pvar[i].a[2];
+
+
+        // defGrad.a[0][0]+=Pvar[i].a[0];
+        // defGrad.a[1][1]+=Pvar[i].a[1];
+        // defGrad.a[2][2]+=Pvar[i].a[2];
+
+        defGrad.a[0][0]+=0.17;
+        defGrad.a[1][1]+=0.;
+        defGrad.a[2][2]+=0.;
+
         std::cerr<<"P: "<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]
                                         <<"V = "<<V<<" Nvar = "<<Nvar<<"\n";
         deformVectors(defGrad);
         checkStability(Pdvar[i]);
 
+        std::cerr<<"Stress : "<<Stress.a[0][0]<<" "<<Stress.a[0][1]
+				        <<" "<<Stress.a[1][0]<<" "<<Stress.a[1][1]<<"\n";
 
+
+        std::cin.get();
+        return ;
         Res_Stab_File<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]<<" "
                 <<int(Pdvar[i].Stability)<<"\n";
 
@@ -222,7 +234,7 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
 void StabilityAnalytically::deformVectors(boost::qvm::mat<double,3,3> &dG)
 {
     // V *=boost::qvm::determinant(dG);
-    V = V0 * boost::qvm::determinant(dG);
+    V = V0 *boost::qvm::determinant(dG);
     // std::cerr<<"V ="<<V<<"\n";
     _1d_V = 1.0/V;
     //std::cerr<<sizeof(boost::qvm::vec<double,2>)<<" "<<2*sizeof(double)<<"\n";
@@ -412,7 +424,7 @@ void StabilityAnalytically::calculateForces()
             E += P_D*( exp_b_ra - 2.0 )*exp_b_ra
                                        + P_D2 * exp_a2_r;
 
-            // std::cerr<<"F "<<i<<" "<<A[i]-1<<" "<<P_a<<" "<<P1[i]<<" "<<P2[i]<<" "<<_1d_V<<"\n";
+            std::cerr<<"F "<<i<<" "<<A[i]-1<<" "<<P_a<<" "<<P1[i]<<" "<<P2[i]<<" "<<_1d_V<<"\n";
             // potFile<<A[i]<<" "<<E<<" "<<P1[i]<<" "<<P2[i]<<"\n";
         }
         else
