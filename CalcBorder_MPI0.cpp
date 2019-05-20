@@ -375,7 +375,8 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar,
     MDC->reachSpecifiedStress(); //поджатие связей
     dG0 = MDC->dG0;
     std::cerr<<"dG0 "<<dG0.a[0][0]<<" "<<dG0.a[0][1]<<" "<<dG0.a[0][2]
-    <<" "<<dG0.a[1][0]<<" "<<dG0.a[1][1]<<" "<<dG0.a[1][2]<<" "<<dG0.a[2][0]<<" "<<dG0.a[2][1]<<" "<<dG0.a[2][2]<<"\n";
+    	<<" "<<dG0.a[1][0]<<" "<<dG0.a[1][1]<<" "<<dG0.a[1][2]<<" "<<dG0.a[2][0]
+							<<" "<<dG0.a[2][1]<<" "<<dG0.a[2][2]<<"\n";
     //std::cerr<<"Elastic\n"
     //<<b.Ex<<" "<<b.Ey<<" "<<b.Ez<<" "<<b.K<<"\n"
     //<<b.Gxy<<" "<<b.Gyz<<" "<<b.Gzx<<"\n"
@@ -447,7 +448,7 @@ SkipCalc0:;
             Result.StabilitySteps = i;
 			Result.NumberBonds = MDC->NM;
 			Result.PotEnergy = PotEnergy;
-			// Result.PotEnergy = Energy;
+
 
             PdataR[Result.i] = Result;
             ResultiC_file<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "

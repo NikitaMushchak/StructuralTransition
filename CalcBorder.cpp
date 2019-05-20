@@ -5,10 +5,10 @@ CalcBorder::CalcBorder()
     //ctor
     SA = nullptr;
     MDC = nullptr;
-    boost::qvm::X(e[0])= -0.4;
+    boost::qvm::X(e[0])= -0.2;
     boost::qvm::Y(e[0])= boost::qvm::X(e[0]);//-0.6;
     boost::qvm::Z(e[0])= boost::qvm::X(e[0])*(MC_s6 - 3.)/(MC_2s3 - 3.);//-0.6; // -0.6
-    boost::qvm::X(e[1])= 0.8; // Было 0.3 для линии ГЦК-ОЦК
+    boost::qvm::X(e[1])= 0.4; // Было 0.3 для линии ГЦК-ОЦК
     boost::qvm::Y(e[1])= boost::qvm::X(e[1]);//-0.1;
     boost::qvm::Z(e[1])= boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
     boost::qvm::X(n) = 50; //размер образца
@@ -395,6 +395,7 @@ void CalcBorder::createIMatrix()
             //std::cin.get();
         }
     }
+    std::cout<<"NM = "<<NM<<"\n";
     // std::cin.get();
 }
 
@@ -422,6 +423,10 @@ void CalcBorder::checkStability(){
     for(uint_fast32_t i=0; i<N; ++i)
     {
         // if(Pdata[i].Stability==2)
+
+            std::cerr<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]<<" V = "
+                                    <<SA->V<<"\n";
+
             ResultC_file<<i<<" "<<P[i].a[0]<<" "<<P[i].a[1]<<" "<<P[i].a[2]
                 <<" "<<int_fast32_t(Pdata[i].Stability)<<" "
                 <<Pdata[i].StabilitySteps<<" "<<Pdata[i].StabilityTime<<

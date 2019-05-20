@@ -49,7 +49,7 @@ StabilityAnalytically::StabilityAnalytically()
     P_a2 = MC_2ds3;
     // P_alfa2/=P_a2;
 
-    P_aCut = 2.;
+    P_aCut = 3.;//0.5*(CSD[3]+CSD[4]);
     P_P1 = 2.0*P_D*P_alfa;
     P_P2 = 2.0*P_D*P_alfa*P_alfa;
     P_F = 2.0*P_D*P_alfa;
@@ -181,7 +181,8 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
         defGrad.a[0][0]+=Pvar[i].a[0];
         defGrad.a[1][1]+=Pvar[i].a[1];
         defGrad.a[2][2]+=Pvar[i].a[2];
-
+        std::cerr<<"P: "<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]
+                                        <<"V = "<<V<<" Nvar = "<<Nvar<<"\n";
         deformVectors(defGrad);
         checkStability(Pdvar[i]);
 
@@ -190,7 +191,7 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
                 <<int(Pdvar[i].Stability)<<"\n";
 
         if(int(Pdvar[i].Stability)==2){
-        Res_File<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]<<" "
+            Res_File<<Pvar[i].a[0]<<" "<<Pvar[i].a[1]<<" "<<Pvar[i].a[2]<<" "
                         <<int(Pdvar[i].Stability)<<"\n";
         }
 
@@ -220,7 +221,9 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar,
 
 void StabilityAnalytically::deformVectors(boost::qvm::mat<double,3,3> &dG)
 {
-    V = V0*boost::qvm::determinant(dG);
+    // V *=boost::qvm::determinant(dG);
+    V = V0 * boost::qvm::determinant(dG);
+    // std::cerr<<"V ="<<V<<"\n";
     _1d_V = 1.0/V;
     //std::cerr<<sizeof(boost::qvm::vec<double,2>)<<" "<<2*sizeof(double)<<"\n";
     memset(ea, 0, sizeof(boost::qvm::vec<double,3>)*N);
@@ -275,11 +278,9 @@ void StabilityAnalytically::checkStability(StabilityPointType &Pd)
                 Q.a[i][j]=0;
             }
         }
-
-
     Pd.StabilitySteps = 1;
     Pd.Stability = 2;
-    for (int m = 0; m<10000; m++){ // шаги проверки устойчивости
+    for (int m = 0; m < 10000; m++){ // шаги проверки устойчивости
         res= distr();
         W.a[0] = res[0];
         W.a[1] = res[1];
@@ -287,6 +288,8 @@ void StabilityAnalytically::checkStability(StabilityPointType &Pd)
 
         Pd.PotEnergy = E;
         Pd.PotStress = Stress.a[0][0]*_1d_V;
+
+        // std::cerr<<"_1d_V = "<<_1d_V<<"\n";
 
         WW = tens(W,W);
         D = dotdot(Q,WW);
