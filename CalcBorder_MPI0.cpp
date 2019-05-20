@@ -229,15 +229,25 @@ void taskSRMPIi(MD *MDC)
         if(Task.i>=0)
         {
             //MDC->eXYMax = 2.0*MDC->LV[1].a[1]*Task.D.a[1][1]/(MDC->LV[0].a[0]*Task.D.a[0][0]);
-            //Task.D.a[0][1] = (MDC->eXYMax<Task.D.a[0][1])?Task.D.a[0][1]:(Task.D.a[0][1]-MDC->eXYMax*int_fast32_t(Task.D.a[0][1]/MDC->eXYMax));
-            //std::cerr<<"Task.Di "<<iproc<<" "<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<MDC->eXYMax<<"\n";
+			// Task.D.a[0][1] = (MDC->eXYMax<Task.D.a[0][1])?Task.D.a[0][1]:(Task.D.a[0][1]-MDC->eXYMax*int_fast32_t(Task.D.a[0][1]/MDC->eXYMax));
+            Task.D.a[0][0] = 1.17;//(MDC->eXYMax<Task.D.a[0][1])?Task.D.a[0][1]:(Task.D.a[0][1]-MDC->eXYMax*int_fast32_t(Task.D.a[0][1]/MDC->eXYMax));
+			Task.D.a[1][1] = 1.;
+			Task.D.a[2][2] = 1.;
+
+			std::cerr<<"Task.Di "<<iproc<<" "<<Task.D.a[0][0]<<" "<<Task.D.a[1][1]<<" "<<Task.D.a[2][2]<<" "<<MDC->eXYMax<<"\n";
             MDC->setMPP();
+
             MDC->createLattice3DT(Task.D);
             MDC->setTemperatureNormal();
             MDC->deformLattice(Task.D);
             ///MDC->saveLattice();
             MDC->createIMatrix();
             MDC->calculateStateIM();
+
+			std::cerr<<"Stress : "<<MDC->Stress.a[0][0]<<" "<<MDC->Stress.a[1][1]
+				<<" "<<MDC->Stress.a[2][2]<<"\n";
+			return ;
+			// std::cin.get();
             MDC->Ek0 = MDC->Ek;
             MDC->Ep0 = MDC->Ep;
             if(MDC->NM==1)goto SkipCalci;
@@ -368,7 +378,13 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityP
             Task = getNextTask();
             //MDC->eXYMax = 2.0*MDC->LV[1].a[1]*Task.D.a[1][1]/(MDC->LV[0].a[0]*Task.D.a[0][0]);
             //Task.D.a[0][1] = (fabs(Task.D.a[0][1])<MDC->eXYMax)?Task.D.a[0][1]:(Task.D.a[0][1]-MDC->eXYMax*int_fast32_t(Task.D.a[0][1]/MDC->eXYMax));
-            std::cerr<<"Task.D0 "<<NSended<<" "<<NReceived<<" "<<NSR<<" "
+
+///////////////////////////////////
+			Task.D.a[0][0] = 1.17;//(MDC->eXYMax<Task.D.a[0][1])?Task.D.a[0][1]:(Task.D.a[0][1]-MDC->eXYMax*int_fast32_t(Task.D.a[0][1]/MDC->eXYMax));
+			Task.D.a[1][1] = 1.;
+			Task.D.a[2][2] = 1.;
+			//////////////////////////////
+			std::cerr<<"Task.D0 "<<NSended<<" "<<NReceived<<" "<<NSR<<" "
 				<<Task.i<<" "<<Task.D.a[0][0]-1<<" "<<Task.D.a[1][1]-1<<" "
 													<<Task.D.a[2][2]-1<<"\n";
 
@@ -379,10 +395,11 @@ void CalcBorder::checkStabilityMPIMD(boost::qvm::vec<double,3> *Pvar, StabilityP
             MDC->createIMatrix();
             //std::cerr<<"Q9"<<"\n";
             MDC->calculateStateIM();
-            // std::cerr<<"Stress "<<MDC->Stress.a[0][0]<<" "<<MDC->Stress.a[0][1]
-			// 	<<" "<<MDC->Stress.a[1][0]<<" "<<MDC->Stress.a[1][1]<<"\n";
+            std::cerr<<"Stress "<<MDC->Stress.a[0][0]<<" "<<MDC->Stress.a[0][1]
+				<<" "<<MDC->Stress.a[1][0]<<" "<<MDC->Stress.a[1][1]<<"\n";
             // std::cerr<<"E "<<MDC->Ek*MDC->_1d_N<<" "<<MDC->Ep*MDC->_1d_N<<" "
 			// 								<<MDC->P_Cmax<<" "<<MDC->P_C<<"\n";
+			return;
 			std::cerr<<"num bonds = "<<MDC->NM/(MDC->N)<<"\n";
 			std::cerr<<"vol = "<<1./(MDC->_1d_Vol*MDC->N)<<"\n";
 

@@ -131,6 +131,10 @@ void StabilityAnalytically::checkStability3D(boost::qvm::vec<double,3> *Pvar, St
     for(uint_fast32_t i=0; i<Nvar; ++i)
     {
         boost::qvm::set_identity(defGrad);
+        // defGrad.a[0][0]+=Pvar[i].a[0];
+        // defGrad.a[1][1]+=Pvar[i].a[1];
+        // defGrad.a[2][2]+=Pvar[i].a[2];
+
         defGrad.a[0][0]+=Pvar[i].a[0];
         defGrad.a[1][1]+=Pvar[i].a[1];
         defGrad.a[2][2]+=Pvar[i].a[2];
@@ -323,8 +327,8 @@ void StabilityAnalytically::calculateForces()
         if (A[i]<P_aCut)
         {
             exp_b_ra = exp( P_alfa*(P_a-A[i]) );
-            P1[i] = -P_P1*( exp_b_ra - 1.0 )*exp_b_ra; //силы взаимодействий
-            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra; //жесткости связей ЦИКЛ ОТ 1 ДО Nvect
+            P1[i] = -P_P1*( exp_b_ra - 1.0 )*exp_b_ra; //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            P2[i] = P_P2*( 2.0*exp_b_ra - 1.0 )*exp_b_ra; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ 1 пїЅпїЅ Nvect
             E += P_D*( exp_b_ra - 2.0 )*exp_b_ra;
 
             //std::cerr<<"F "<<i<<" "<<A[i]<<" "<<P1[i]<<" "<<P2[i]<<"\n";
@@ -420,7 +424,7 @@ FindSphere:
     for(uint_fast32_t i=1; i<MaxCSDN; ++i)
     {
         SVp[i] = RSN;
-        RSN+=CSN[i]/2;//убираем симметричные вектора e[-k] = -e[k]
+        RSN+=CSN[i]/2;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ e[-k] = -e[k]
         //if(CSN[i]%2)std::cerr<<"ERRRRRRR!!!!\n\n\n";
         //std::cerr<<"Q "<<i<<" "<<RSN<<" "<<CSN[i]<<" "<<CSD[i]<<" "<<SVp[i]<<"\n";
         //std::cerr<<"Q3 "<<i<<" "<<CoordSphereParticlesNumber[i]<<" "<<SphereVectorsPosition[i]<<"\n";

@@ -39,7 +39,7 @@ void MD::calculateForcesIM()
             //<<" "<<ps.a[0]<<" "<<ps.a[1]<<"\n";
             dr = R[j]-R[i]-ps;
             //std::cerr<<boost::qvm::mag_sqr(dr)<<" "<<Rj.a[0]<<" "<<Rj.a[1]<<" "<<Rj.a[2]<<" "<<i<<" "<<j<<"\n";
-            //dr_mm = boost::qvm::mag_sqr(dr);
+            dr_mm = boost::qvm::mag_sqr(dr);
             //if(fabs(boost::qvm::mag_sqr(dr)-1.0)>1e-5)
             //std::cerr<<"ERROR! "<<boost::qvm::mag_sqr(dr)-1.0<<" "<<i<<" "<<j<<" "<<dr.a[0]<<" "<<dr.a[1]<<" "<<dr.a[2]<<" "<<ps.a[0]<<" "<<ps.a[1]<<" "<<ps.a[2]<<"\n";
             if(dr_mm<P_aa_cut)//{std::cerr<<"ERROR! "<<i<<" "<<j<<" "<<dr.a[0]<<" "<<dr.a[1]<<" "<<dr_mm<<" "<<ps.a[0]<<" "<<ps.a[1]<<"\n";std::cin.get();}
@@ -91,9 +91,10 @@ void MD::calculateStateIM()
     P_Cmax = P_C;
     for(i=0; i<N; ++i)
     {
-        //std::cerr<<i<<" ";
+        std::cerr<<" i = "<<i;
         for(m=0; m<NMd2; ++m)
         {
+            std::cerr<<" m = "<<m;
             Rj = Ri[i] + M[m];
             vp.a[0] = int_fast32_t(Rj.a[0]<0)-int_fast32_t(Rj.a[0]>=n.a[0]);
             vp.a[1] = int_fast32_t(Rj.a[1]<0)-int_fast32_t(Rj.a[1]>=n.a[1]);
@@ -107,9 +108,11 @@ void MD::calculateStateIM()
             ps = double(vp.a[0])*PS[0]+double(vp.a[1])*PS[1]+double(vp.a[2])*PS[2];
             dr = R[j]-R[i]-ps;
 
+            dr_m = boost::qvm::mag(dr);
+
             if(dr_m<P_a_cut)
             {
-                dr_m = boost::qvm::mag(dr);
+
                 _1d_r = 1.0/dr_m;
                 exp_a_r = exp(P_alfa*(P_a-dr_m));
 				exp_a2_r = exp(P_alfa2 * (P_a2 - dr_m) *(dr_m - P_a2));
@@ -122,6 +125,8 @@ void MD::calculateStateIM()
                 Stress -= tens(f,dr);
                 //S = tens(f,dr);
                 S = tens(dr,dr);
+                std::cerr<<"dr_m = "<<dr_m<<" f = "<<f.a[0]<<" "<< f.a[1]<<" "
+                                                <<f.a[2]<<"  Ep = "<<Ep <<"\n";
                 //std::cerr<<"S "<<S.a[0][0]<<" "<<S.a[1][1]<<" "<<f.a[0]*dr.a[0]<<" "<<f.a[1]*dr.a[1]<<" "<<dr_mm<<"\n";
                 //std::cerr<<"S "<<S.a[0][0]<<" "<<S.a[1][1]<<" "<<f.a[0]<<" "<<dr.a[0]<<" "<<f.a[1]<<" "<<dr.a[1]<<" "<<dr_mm<<"\n";
                 //std::cerr.precision(2);
@@ -140,7 +145,7 @@ void MD::calculateStateIM()
     //std::cerr<<"P_dt "<<P_dt<<" "<<P_Cmax<<"\n";
     Stress *= _1d_Vol;
 
-    std::cerr<<"_1d_Vol = "<<_1d_Vol<<"\n";
+    // std::cerr<<"_1d_Vol = "<<_1d_Vol<<"\n";
 
     Ek *= 0.5*P_M;
     T = Ek*_1d_N*_1d_k_PhysConst;

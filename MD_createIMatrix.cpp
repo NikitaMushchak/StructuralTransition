@@ -28,7 +28,7 @@ void MD::createIMatrix(const bool &recreate)
             ++NM;
         }
     }
-    //std::cerr<<"M "<<NM<<" "<<P_aa_cut<<"\n";
+    std::cerr<<"M "<<NM<<" "<<P_aa_cut<<"\n";
     NMd2 = (NM)/2;
 
     boost::qvm::vec<int_fast32_t,3> *tempM = new boost::qvm::vec<int_fast32_t,3>[NM];
