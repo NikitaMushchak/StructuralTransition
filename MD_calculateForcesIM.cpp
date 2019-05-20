@@ -42,7 +42,7 @@ void MD::calculateForcesIM()
             //dr_mm = boost::qvm::mag_sqr(dr);
             //if(fabs(boost::qvm::mag_sqr(dr)-1.0)>1e-5)
             //std::cerr<<"ERROR! "<<boost::qvm::mag_sqr(dr)-1.0<<" "<<i<<" "<<j<<" "<<dr.a[0]<<" "<<dr.a[1]<<" "<<dr.a[2]<<" "<<ps.a[0]<<" "<<ps.a[1]<<" "<<ps.a[2]<<"\n";
-            //if(dr_mm>P_aa_cut){std::cerr<<"ERROR! "<<i<<" "<<j<<" "<<dr.a[0]<<" "<<dr.a[1]<<" "<<dr_mm<<" "<<ps.a[0]<<" "<<ps.a[1]<<"\n";std::cin.get();}
+            if(dr_mm<P_aa_cut)//{std::cerr<<"ERROR! "<<i<<" "<<j<<" "<<dr.a[0]<<" "<<dr.a[1]<<" "<<dr_mm<<" "<<ps.a[0]<<" "<<ps.a[1]<<"\n";std::cin.get();}
             {
                 dr_m = boost::qvm::mag(dr);
                 _1d_r = 1.0/dr_m;
@@ -57,7 +57,8 @@ void MD::calculateForcesIM()
                 Ep += P_D*exp_a_r*(exp_a_r-2.0) + P_D2 * exp_a2_r ;
                 Stress -= tens(dr,f);
                 //S = tens(f,dr);
-                S = tens(dr,dr);
+                S = tens(dr,dr); //Где используется?
+
                 //std::cerr<<"S "<<S.a[0][0]<<" "<<S.a[1][1]<<" "<<f.a[0]*dr.a[0]<<" "<<f.a[1]*dr.a[1]<<" "<<dr_mm<<"\n";
                 //std::cerr<<"S "<<S.a[0][0]<<" "<<S.a[1][1]<<" "<<f.a[0]<<" "<<dr.a[0]<<" "<<f.a[1]<<" "<<dr.a[1]<<" "<<dr_mm<<"\n";
                 //std::cerr.precision(2);
@@ -68,7 +69,7 @@ void MD::calculateForcesIM()
         }
         //std::cin.get();
     }
-    Stress *= _1d_Vol;
+    Stress *= _1d_Vol; /////
 
     //std::cerr<<"Stress "<<Stress.a[0][0]<<" "<<Stress.a[0][1]<<" "<<Stress.a[1][0]<<" "<<Stress.a[1][1]<<" "<<Vol-1<<" "<<iN<<" "<<N<<" "<<iN/N<<"\n";
     //std::cin.get();
@@ -106,7 +107,7 @@ void MD::calculateStateIM()
             ps = double(vp.a[0])*PS[0]+double(vp.a[1])*PS[1]+double(vp.a[2])*PS[2];
             dr = R[j]-R[i]-ps;
 
-
+            if(dr_m<P_a_cut)
             {
                 dr_m = boost::qvm::mag(dr);
                 _1d_r = 1.0/dr_m;
@@ -117,7 +118,7 @@ void MD::calculateStateIM()
                                                     ( P_a2 - dr_m))*_1d_r)*dr;
                 c = P_C*exp_a_r*(2.0*exp_a_r-1.0) + P_C2 *exp_a2_r*(1.0-
                                 2.0 * P_alfa2*(dr_m - P_alfa2)*(dr_m - P_alfa2));
-                Ep += P_D*exp_a_r*(exp_a_r-2.0) + P_D2 * exp_a2_r ;
+                Ep += P_D*exp_a_r*(exp_a_r-2.0) + P_D2 * exp_a2_r;
                 Stress -= tens(f,dr);
                 //S = tens(f,dr);
                 S = tens(dr,dr);
@@ -138,6 +139,9 @@ void MD::calculateStateIM()
     P_dtM = P_dt*P_1d_M;
     //std::cerr<<"P_dt "<<P_dt<<" "<<P_Cmax<<"\n";
     Stress *= _1d_Vol;
+
+    std::cerr<<"_1d_Vol = "<<_1d_Vol<<"\n";
+
     Ek *= 0.5*P_M;
     T = Ek*_1d_N*_1d_k_PhysConst;
     //std::cin.get();

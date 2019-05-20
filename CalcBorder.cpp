@@ -11,9 +11,9 @@ CalcBorder::CalcBorder()
     boost::qvm::X(e[1])= 0.4; // Было 0.3 для линии ГЦК-ОЦК
     boost::qvm::Y(e[1])= boost::qvm::X(e[1]);//-0.1;
     boost::qvm::Z(e[1])= boost::qvm::X(e[1])*(MC_s6 - 3.)/(MC_2s3 - 3.);// -0.1;
-    boost::qvm::X(n) = 100;
-    boost::qvm::Y(n) = 100;//2*uint_fast32_t(X(n)*MC_1ds3);
-    boost::qvm::Z(n) = 100;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::X(n) = 50;
+    boost::qvm::Y(n) = 50;//2*uint_fast32_t(X(n)*MC_1ds3);
+    boost::qvm::Z(n) = 50;//2*uint_fast32_t(X(n)*MC_1ds3);
     BorderPrecision = 1e-2;
     NStepA = 1000;
 	NStepB = 1000;
@@ -395,6 +395,7 @@ void CalcBorder::createIMatrix()
             //std::cin.get();
         }
     }
+    std::cout<<"NM = "<<NM<<std::endl;
     //std::cin.get();
 }
 
